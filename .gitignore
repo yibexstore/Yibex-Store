@@ -1,0 +1,10 @@
+# Sistema y editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Dependencias y archivos temporales
+node_modules/
+*.log
+.env
