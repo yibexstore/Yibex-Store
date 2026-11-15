@@ -1,15 +1,10 @@
 
 // ── DATA ── (Firebase-powered, no localStorage for admin data)
-const AH='49c96d47e8609b95fb2dc580bb1947e3a288a3a8208c76fecb62e707451ccf32';
+const ADMIN_EMAIL='yibiermunoz2@gmail.com';
 const OW=7*24*60*60*1000;
 const dAgo=n=>new Date(Date.now()-n*864e5).toISOString();
 
-const DC=[
-  {id:'skinny',label:'Skinny',img:null},
-  {id:'wide-leg',label:'Wide Leg',img:null},
-  {id:'mom-fit',label:'Mom Fit',img:null},
-  {id:'flare',label:'Flare',img:null},
-];
+const DC=[];
 
 // Global state — populated by Firebase real-time listeners
 let cats = DC.slice();
@@ -89,7 +84,7 @@ function renderCatHighlights(){
   const toShow=cats;
   row.innerHTML=toShow.map(c=>`
     <div class="col-cat-item" onclick="scrollToTiendaCat('${c.id}')">
-      <div class="col-cat-icon" style="color:var(--gold)">
+      <div class="col-cat-icon" style="color:var(--accent)">
         ${c.img
           ? `<img src="${c.img}" alt="${c.label}" style="width:100%;height:100%;object-fit:cover;object-position:center center;transform:scale(${c.imgZoom||1}) translate(${(c.imgDx||0)/(c.imgZoom||1)}px,${(c.imgDy||0)/(c.imgZoom||1)}px);transform-origin:center center;pointer-events:none">`
           : getCatSVG(c.label)
@@ -203,7 +198,7 @@ function getHotIds(){
 
 // ── PRODUCT CARD ──
 function pSVG(p){
-  const ch={'negro':'#1C1C1E','azul oscuro':'#1B3A6B','azul claro':'#4a6fa5','gris claro':'#6a7888','cafe':'#8B7355','verde':'#2D6A4F'};
+  const ch={'negro':'#1C1C1E','azul oscuro':'#1B3A6B','azul claro':'#4a6fa5','gris claro':'#6a7888','cafe':'#6b7280','verde':'#2D6A4F'};
   const c=ch[p.color]||'#2a2a3a';
   const tp=p.type;
   if(tp==='falda short')return`<path d="M60 40L140 40L162 210L38 210Z" fill="${c}" opacity=".55"/><rect x="55" y="30" width="90" height="13" rx="3" fill="${c}" opacity=".8"/>`;
@@ -242,7 +237,7 @@ function mkCard(p, allowHot=true){
     <div class="pc-body">
       <div class="pc-name">${p.name}</div>
       ${pricesHTML}
-      ${sizeTxt?`<div class="pc-sizes"><svg class="pc-sizes-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--gold);flex-shrink:0"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg> Tallas disponibles: ${sizeTxt}</div>`:''}
+      ${sizeTxt?`<div class="pc-sizes"><svg class="pc-sizes-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent);flex-shrink:0"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg> Tallas disponibles: ${sizeTxt}</div>`:''}
       ${ci
         ?`<div class="pc-qty-ctrl" onclick="event.stopPropagation()">
             <button class="pc-qty-btn" onclick='event.stopPropagation();qtyCart(${pid},-1)'>−</button>
@@ -261,12 +256,12 @@ function mkCard(p, allowHot=true){
   </div>`;
 }
 function mkCSVG(id){
-  if(id==='flare')return`<path d="M50 25L150 25L170 265L130 265L100 175L70 265L30 265Z" fill="rgba(201,168,76,.25)"/><rect x="45" y="15" width="110" height="12" rx="3" fill="rgba(201,168,76,.4)"/>`;
-  if(id==='skinny')return`<path d="M60 25L140 25L128 265L112 265L100 175L88 265L72 265Z" fill="rgba(201,168,76,.25)"/><rect x="55" y="15" width="90" height="12" rx="3" fill="rgba(201,168,76,.4)"/>`;
-  if(id==='mom-fit')return`<path d="M36 25L164 25L152 265L112 265L100 175L88 265L48 265Z" fill="rgba(201,168,76,.25)"/><rect x="31" y="15" width="138" height="12" rx="3" fill="rgba(201,168,76,.4)"/>`;
-  if(id==='wide-leg')return`<path d="M32 25L168 25L158 265L116 265L100 175L84 265L42 265Z" fill="rgba(201,168,76,.25)"/><rect x="27" y="15" width="146" height="12" rx="3" fill="rgba(201,168,76,.4)"/>`;
-  if(id==='falda-short'||id==='falda')return`<path d="M60 40L140 40L162 210L38 210Z" fill="rgba(201,168,76,.25)"/><rect x="55" y="30" width="90" height="12" rx="3" fill="rgba(201,168,76,.4)"/>`;
-  return`<path d="M38 25L162 25L152 265L112 265L100 175L88 265L48 265Z" fill="rgba(201,168,76,.25)"/><rect x="33" y="15" width="134" height="12" rx="3" fill="rgba(201,168,76,.4)"/>`;
+  if(id==='flare')return`<path d="M50 25L150 25L170 265L130 265L100 175L70 265L30 265Z" fill="rgba(59,130,246,.25)"/><rect x="45" y="15" width="110" height="12" rx="3" fill="rgba(59,130,246,.4)"/>`;
+  if(id==='skinny')return`<path d="M60 25L140 25L128 265L112 265L100 175L88 265L72 265Z" fill="rgba(59,130,246,.25)"/><rect x="55" y="15" width="90" height="12" rx="3" fill="rgba(59,130,246,.4)"/>`;
+  if(id==='mom-fit')return`<path d="M36 25L164 25L152 265L112 265L100 175L88 265L48 265Z" fill="rgba(59,130,246,.25)"/><rect x="31" y="15" width="138" height="12" rx="3" fill="rgba(59,130,246,.4)"/>`;
+  if(id==='wide-leg')return`<path d="M32 25L168 25L158 265L116 265L100 175L84 265L42 265Z" fill="rgba(59,130,246,.25)"/><rect x="27" y="15" width="146" height="12" rx="3" fill="rgba(59,130,246,.4)"/>`;
+  if(id==='falda-short'||id==='falda')return`<path d="M60 40L140 40L162 210L38 210Z" fill="rgba(59,130,246,.25)"/><rect x="55" y="30" width="90" height="12" rx="3" fill="rgba(59,130,246,.4)"/>`;
+  return`<path d="M38 25L162 25L152 265L112 265L100 175L88 265L48 265Z" fill="rgba(59,130,246,.25)"/><rect x="33" y="15" width="134" height="12" rx="3" fill="rgba(59,130,246,.4)"/>`;
 }
 
 // ── FILTERS ──
@@ -462,7 +457,7 @@ async function chkP(){
   if(btn){ btn.disabled = true; btn.textContent = 'Verificando...'; }
   try {
     const { auth, signInWithEmailAndPassword } = window._fb;
-    await signInWithEmailAndPassword(auth, 'rdstilos2@gmail.com', pwd);
+    await signInWithEmailAndPassword(auth, ADMIN_EMAIL, pwd);
     document.getElementById('adm-err').style.display = 'none';
     document.getElementById('adm-login').style.display = 'none';
     document.getElementById('adm-dash').classList.add('on');
@@ -503,11 +498,11 @@ function buildCropBox(mountId,key,aspect,onAccept){
       <input type="file" id="crop-file-${key}" accept="image/*" style="display:none" onchange="cropLoad('${key}',event,'${aspect}',${aspect==='free'?'null':"'3/4'"})">
       <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center">
         <button onclick="document.getElementById('crop-file-${key}').click()" style="padding:7px 16px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.7);font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;border-radius:2px">📁 Elegir imagen</button>
-        <button id="crop-accept-${key}" onclick="cropAccept('${key}')" style="display:none;padding:7px 16px;background:var(--gold);border:none;color:var(--dark);font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;font-weight:700;cursor:pointer;border-radius:2px">✔ Aceptar</button>
+        <button id="crop-accept-${key}" onclick="cropAccept('${key}')" style="display:none;padding:7px 16px;background:var(--accent);border:none;color:var(--dark);font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;font-weight:700;cursor:pointer;border-radius:2px">✔ Aceptar</button>
       </div>
       <div id="crop-range-${key}" style="display:none;margin-top:10px">
-        <label style="font-size:.52rem;color:var(--gold-d);letter-spacing:.1em">Zoom</label>
-        <input type="range" min="1" max="3" step="0.01" value="1" style="width:100%;margin-top:4px;accent-color:var(--gold)" oninput="cropZoom('${key}',this.value)">
+        <label style="font-size:.52rem;color:var(--accent-d);letter-spacing:.1em">Zoom</label>
+        <input type="range" min="1" max="3" step="0.01" value="1" style="width:100%;margin-top:4px;accent-color:var(--accent)" oninput="cropZoom('${key}',this.value)">
       </div>
     </div>`;
   cropState[key]={src:null,zoom:1,dx:0,dy:0,dragging:false,startX:0,startY:0,onAccept};
@@ -588,7 +583,7 @@ function buildSliderCrop(mountId, key, onAccept){
         display:flex;align-items:center;justify-content:center;
         margin-bottom:12px;border-radius:2px;
         cursor:grab;user-select:none;touch-action:none;
-        border:1px solid rgba(201,168,76,.15);
+        border:1px solid rgba(59,130,246,.15);
       ">
         <span id="scrop-ph-${key}" style="color:rgba(255,255,255,.18);font-size:2rem;pointer-events:none">🖼</span>
         <img id="scrop-img-${key}" style="
@@ -599,7 +594,7 @@ function buildSliderCrop(mountId, key, onAccept){
         " alt="">
         <div style="
           position:absolute;inset:0;pointer-events:none;
-          border:1.5px solid rgba(201,168,76,.25);border-radius:2px;
+          border:1.5px solid rgba(59,130,246,.25);border-radius:2px;
           box-shadow:inset 0 0 40px rgba(0,0,0,.3);
         "></div>
         <div id="scrop-hint-${key}" style="
@@ -613,9 +608,9 @@ function buildSliderCrop(mountId, key, onAccept){
       <!-- Zoom -->
       <div id="scrop-zoom-row-${key}" style="display:none;margin-bottom:10px">
         <div style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);padding:8px 12px;border-radius:2px">
-          <span style="font-size:.5rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-d);flex-shrink:0;min-width:38px">Zoom</span>
+          <span style="font-size:.5rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-d);flex-shrink:0;min-width:38px">Zoom</span>
           <input type="range" id="scrop-range-${key}" min="1" max="3" step="0.01" value="1"
-            style="flex:1;accent-color:var(--gold);height:3px;cursor:pointer"
+            style="flex:1;accent-color:var(--accent);height:3px;cursor:pointer"
             oninput="scropZoom('${key}',this.value)">
           <span id="scrop-zval-${key}" style="font-size:.56rem;color:rgba(255,255,255,.4);min-width:32px;text-align:right">1×</span>
         </div>
@@ -628,12 +623,12 @@ function buildSliderCrop(mountId, key, onAccept){
           border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.7);
           font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;
           cursor:pointer;border-radius:2px;transition:all .2s;
-        " onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='rgba(255,255,255,.15)'">
+        " onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='rgba(255,255,255,.15)'">
           📁 Elegir imagen
         </button>
         <button id="scrop-accept-${key}" onclick="scropAccept('${key}')" style="
           display:none;padding:8px 18px;
-          background:var(--gold);border:none;color:var(--dark);
+          background:var(--accent);border:none;color:var(--dark);
           font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;
           font-weight:700;cursor:pointer;border-radius:2px;transition:all .2s;
         ">✔ Guardar posición</button>
@@ -1144,13 +1139,7 @@ function toast(msg){const t=document.getElementById('toast');if(!t)return;t.text
 
 
 // ── RESEÑAS ──
-const DR=[
-  {id:'r1',name:'Camila Escobar',date:'2026-03-25',stars:5,msg:'Me encantó cómo me quedó. Pedí un baggy y es perfecto, no aprieta y se ve demasiado lindo. Ya quiero otro color.',approved:true},
-  {id:'r2',name:'Daniela Gil',date:'2026-02-13',stars:4,msg:'Los jeans con brillitos son hermosos, pensé que se iban a caer pero no, están súper bien hechos, los recomiendo.',approved:true},
-  {id:'r3',name:'Andrés',date:'2025-12-18',stars:5,msg:'Se lo regalé a mi novia y le encantó, le quedó perfecto y dijo que era de los más cómodos que tiene. Muy buena compra.',approved:true},
-  {id:'r4',name:'Valeria.1048',date:'2025-10-08',stars:5,msg:'Compré una falda short y me gustó mucho porque no se sube al caminar, además la tela es suave y se ve muy bonito puesto.',approved:true},
-  {id:'r5',name:'Juliana Peña',date:'2025-05-02',stars:4,msg:'Pedí unos palazos y uff, son frescos y quedan elegantes pero cómodos. Literal los uso para todo.',approved:true},
-];
+const DR=[];
 let reviews = [];
 // svR now handled by Firebase — individual operations write directly
 
@@ -1203,7 +1192,7 @@ function renderAdmRes(){
   el.innerHTML=reviews.map(r=>`
     <div class="res-adm-row">
       <div class="res-adm-body">
-        <div class="res-adm-name">${r.name} ${r.approved?'<span style="color:#2d9c5f;font-size:.55rem">✔ Aprobada</span>':'<span style="color:var(--gold);font-size:.55rem">⏳ Pendiente</span>'}</div>
+        <div class="res-adm-name">${r.name} ${r.approved?'<span style="color:#2d9c5f;font-size:.55rem">✔ Aprobada</span>':'<span style="color:var(--accent);font-size:.55rem">⏳ Pendiente</span>'}</div>
         <div class="res-adm-stars">${starsHTML(r.stars)}</div>
         <div class="res-adm-msg">"${r.msg}"</div>
         <div class="res-adm-date">${fmtDate(r.date)}</div>

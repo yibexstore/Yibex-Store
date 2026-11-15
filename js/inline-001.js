@@ -1,6 +1,6 @@
 
 // ══════════════════════════════════════════════════════
-//  FIREBASE CONFIG — Raw Desire Stilos
+//  FIREBASE CONFIG — Yibex Store
 //  SIN Storage — imágenes guardadas en Firestore
 // ══════════════════════════════════════════════════════
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -8,12 +8,12 @@ import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, ge
 import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCqUn02AFQ--QgZPydk-PTNX7A5AFZknoA",
-  authDomain: "stiles-rd.firebaseapp.com",
-  projectId: "stiles-rd",
-  storageBucket: "stiles-rd.firebasestorage.app",
-  messagingSenderId: "175951702828",
-  appId: "1:175951702828:web:02109a3da61c0153e8da89"
+  apiKey: "AIzaSyAkn0HJjTP1cgbi4MuE9uzm8JGH2blxjnA",
+  authDomain: "yibexstore-3f2ae.firebaseapp.com",
+  projectId: "yibexstore-3f2ae",
+  storageBucket: "yibexstore-3f2ae.firebasestorage.app",
+  messagingSenderId: "600444423434",
+  appId: "1:600444423434:web:e7544d691de4b27e747ef3"
 };
 
 const fbApp = initializeApp(firebaseConfig);
@@ -123,7 +123,7 @@ async function fbInit(){
     // Categorías
     const catsSnap = await getDoc(doc(db,'config','cats'));
     if(catsSnap.exists() && catsSnap.data().list){ cats = catsSnap.data().list; }
-    else { await setDoc(doc(db,'config','cats'), {list: cats}); }
+    
 
     // Config del sitio
     const siteSnap = await getDoc(doc(db,'config','site'));
@@ -136,30 +136,9 @@ async function fbInit(){
     prodsSnap.forEach(d=>{ prods.push({...d.data(), _fbId: d.id}); });
     prods.sort((a,b)=>new Date(b.dateAdded)-new Date(a.dateAdded));
 
-    // Si no hay productos, crear demo
-    if(!prods.length){
-      const dAgo=n=>new Date(Date.now()-n*864e5).toISOString();
-      const demo=[
-        {name:"Skinny Negro",size:"10",color:"negro",type:"skinny",price:52000,category:"skinny",dateAdded:dAgo(2),img:null},
-        {name:"Wide Leg Azul",size:"8",color:"azul oscuro",type:"wide leg",price:58000,category:"wide-leg",dateAdded:dAgo(3),img:null},
-        {name:"Mom Fit Gris",size:"10",color:"gris claro",type:"mom fit",price:55000,category:"mom-fit",dateAdded:dAgo(4),img:null},
-        {name:"Flare Azul",size:"8",color:"azul claro",type:"flare",price:60000,category:"flare",dateAdded:dAgo(5),img:null},
-      ];
-      for(const p of demo){
-        const ref = await addDoc(collection(db,'products'), p);
-        prods.push({...p, _fbId: ref.id});
-      }
-    }
-
     // Reseñas
     const revSnap = await getDocs(collection(db,'reviews'));
-    if(revSnap.empty){
-      for(const r of DR){ await addDoc(collection(db,'reviews'), r); }
-      const revSnap2 = await getDocs(collection(db,'reviews'));
-      reviews=[]; revSnap2.forEach(d=>reviews.push({...d.data(), id:d.id}));
-    } else {
-      reviews=[]; revSnap.forEach(d=>reviews.push({...d.data(), id:d.id}));
-    }
+    reviews=[]; revSnap.forEach(d=>reviews.push({...d.data(), id:d.id}));
     reviews.sort((a,b)=>new Date(b.date)-new Date(a.date));
 
     // Renderizar todo
