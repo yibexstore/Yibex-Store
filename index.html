@@ -2,42 +2,38 @@
 
 <html lang="es">
 <head>
+<link rel="icon" type="image/png" href="assets/favicon.png"/>
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png"/>
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1.0" name="viewport"/>
-<title>Raw Desire Stilos | Jeans y Ropa para Mujer en Colombia</title>
-<meta content="Raw Desire Stilos – Tu tienda de jeans y ropa femenina en Colombia. Encuentra skinny, wide leg, mom fit, flare y más. Envíos a todo el país. ¡Compra ahora!" name="description"/>
-<meta content="jeans mujer Colombia, ropa femenina, skinny jeans, wide leg, mom fit, flare, stilos jeans, comprar jeans online Colombia" name="keywords"/>
+<title>Yibex Store | Todo lo que necesitas en un solo lugar</title>
+<meta content="Yibex Store – Tu tienda en línea con productos de todo tipo en un solo lugar. Buenos precios y atención directa por WhatsApp. ¡Compra ahora!" name="description"/>
+<meta content="Yibex Store, tienda en línea, comprar online, productos, ofertas, Colombia" name="keywords"/>
 <meta content="index, follow" name="robots"/>
-<link href="https://c73230061-wq.github.io/STILOS-RD/" rel="canonical"/>
+<link href="https://yibexstore.github.io/Yibex-Store/" rel="canonical"/>
 <!-- Open Graph -->
 <meta content="website" property="og:type"/>
-<meta content="Raw Desire Stilos | Jeans y Ropa para Mujer en Colombia" property="og:title"/>
-<meta content="Descubre la colección de jeans y ropa femenina de Raw Desire Stilos. Skinny, wide leg, mom fit, flare y más. Envíos a todo el país." property="og:description"/>
-<meta content="https://c73230061-wq.github.io/STILOS-RD/" property="og:url"/>
-<meta content="Raw Desire Stilos" property="og:site_name"/>
+<meta content="Yibex Store | Todo lo que necesitas en un solo lugar" property="og:title"/>
+<meta content="Descubre los productos de Yibex Store: variedad, buenos precios y atención directa por WhatsApp." property="og:description"/>
+<meta content="https://yibexstore.github.io/Yibex-Store/" property="og:url"/>
+<meta content="Yibex Store" property="og:site_name"/>
 <meta content="es_CO" property="og:locale"/>
 <!-- Twitter Card -->
 <meta content="summary_large_image" name="twitter:card"/>
-<meta content="Raw Desire Stilos | Jeans y Ropa para Mujer en Colombia" name="twitter:title"/>
-<meta content="Jeans y ropa femenina de calidad. Skinny, wide leg, mom fit y más. Envíos a todo Colombia." name="twitter:description"/>
+<meta content="Yibex Store | Todo lo que necesitas en un solo lugar" name="twitter:title"/>
+<meta content="Variedad, buenos precios y atención directa por WhatsApp." name="twitter:description"/>
 <!-- Structured Data: Local Business -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "ClothingStore",
-  "name": "Raw Desire Stilos",
-  "description": "Tienda de jeans y ropa femenina en Colombia. Skinny, wide leg, mom fit, flare y más.",
-  "url": "https://c73230061-wq.github.io/STILOS-RD/",
-  "telephone": "+573507243351",
+  "name": "Yibex Store",
+  "description": "Tienda en línea con productos de todo tipo en un solo lugar.",
+  "url": "https://yibexstore.github.io/Yibex-Store/",
   "address": {
     "@type": "PostalAddress",
     "addressCountry": "CO"
   },
-  "sameAs": [
-    "https://www.instagram.com/stilosrdjeans",
-    "https://www.facebook.com/profile.php?id=61574894803320",
-    "https://www.tiktok.com/@stilosrdjeans"
-  ],
   "openingHoursSpecification": {
     "@type": "OpeningHoursSpecification",
     "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
@@ -53,247 +49,82 @@
 </head>
 <body>
 <!-- ══ NAVBAR ══ -->
-<nav class="nav" id="nav">
-<div class="nav-left" style="display:flex;align-items:center;gap:8px">
-<button class="nav-ham" onclick="toggleSB()">
-<span></span><span></span><span></span>
+<nav class="nav hd" id="nav">
+<button class="hd-menu" onclick="toggleMenu(true)" aria-label="Abrir menú">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
 </button>
-<button class="nav-link on" onclick="window.scrollTo({top:0,behavior:'smooth'})">Inicio</button>
-<button class="nav-link" onclick="document.getElementById('tienda').scrollIntoView({behavior:'smooth'})">Tienda</button>
+<div class="hd-brand" id="adm-trigger" onclick="logoTap()">
+<img alt="Yibex Store" class="hd-logo" src="assets/logo.png"/>
+<span class="hd-name">Yibex<br>Store</span>
 </div>
-<div class="nav-center" id="adm-trigger" onclick="logoTap()">
-<!-- LOGO: cuando tengas el logo, cambia src por assets/logo.png y quita display:none --><img alt="Yibex Store" class="nav-logo-img" src="" style="display:none"/>
-<div class="nav-logo-text"><b>Yibex</b><span>Store</span></div>
+<div class="hd-links">
+<button onclick="goTo('home')">Inicio</button>
+<button onclick="goTo('catalogo')">Catálogo</button>
+<button onclick="goTo('categorias')">Categorías</button>
+<button onclick="goTo('nosotros')">Sobre nosotros</button>
 </div>
-<div class="nav-right" style="display:flex;align-items:center;gap:8px">
-<button class="nav-link" onclick="document.getElementById('nosotros').scrollIntoView({behavior:'smooth'})">Nosotros</button>
-<button class="nav-link" onclick="document.getElementById('nosotros').scrollIntoView({behavior:'smooth'})">Contacto</button>
-<button class="nav-cart" onclick="openCart()">
-<div class="nav-cart-icon">
-<svg fill="none" stroke-width="1.6" viewbox="0 0 24 24">
-<path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"></path>
-<line x1="3" x2="21" y1="6" y2="6"></line>
-<path d="M16 10a4 4 0 01-8 0"></path>
-</svg>
+<div class="hd-right">
+<button class="hd-icon" onclick="document.getElementById('srch').focus()" aria-label="Buscar">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
+</button>
+<button class="hd-cart" onclick="openCart()" aria-label="Carrito">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/><path d="M2 3h3l2.7 12.4a1.5 1.5 0 001.5 1.2h8.6a1.5 1.5 0 001.5-1.1L21 7H6"/></svg>
 <span class="cart-bubble" id="cart-bubble">0</span>
-</div>
-<span class="nav-cart-tot" id="nav-cart-tot"></span>
 </button>
 </div>
 </nav>
-<!-- ══ HERO ══ -->
-<section id="hero">
-<!-- Slide 1 (principal) -->
-<div class="hero-slide on" id="slide-0">
-<div class="hero-slide-bg" id="slide-bg-0" style="background-image:url();background-size:cover;background-position:70% center;">
-<!-- placeholder logo when no image -->
-<div class="hero-placeholder" id="hero-ph-0" style="display:none">
-
+<div class="hd-search">
+<div class="mini-search">
+<input id="srch" type="search" placeholder="¿Qué estás buscando?" autocomplete="off" enterkeyhint="search" onkeydown="if(event.key==='Enter')doSearch(true)"/>
+<button type="button" onclick="doSearch(true)" aria-label="Buscar"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg></button>
 </div>
 </div>
-<div class="hero-content">
-<p class="hero-eyebrow">Siéntete única.</p>
-<h1 class="hero-h1" id="hero-h1">JEANS QUE<br/>REALZAN<br/>TU ESTILO.</h1>
-<div class="hero-rule"><span class="hero-rule-heart">♥</span></div>
-<p class="hero-sub" id="hero-sub">Jeans que realzan<br/>tu esencia.</p>
-<button class="hero-cta" onclick="document.getElementById('tienda').scrollIntoView({behavior:'smooth'})">Comprar Ahora</button>
+<div class="sm-ov" id="sm-ov" onclick="toggleMenu(false)"></div>
+<aside class="sm" id="sm">
+<div class="sm-hd"><img alt="" src="assets/logo.png"/><span>Yibex Store</span><button onclick="toggleMenu(false)" aria-label="Cerrar">✕</button></div>
+<button onclick="goTo('home')">Inicio</button>
+<button onclick="goTo('catalogo')">Catálogo</button>
+<button onclick="goTo('categorias')">Categorías</button>
+<button onclick="goTo('nosotros')">Sobre nosotros</button>
+</aside>
+<div id="view-home">
+<!-- ══ LO MÁS VENDIDO ══ -->
+<section id="vendido" style="display:none">
+<div class="sec-hd">
+<div>
+<p class="sec-ey">Selección de la semana</p>
+<h2 class="sec-title">Lo más vendido esta semana</h2>
 </div>
 </div>
-<!-- Slide 2 -->
-<div class="hero-slide" id="slide-1">
-<div class="hero-slide-bg" id="slide-bg-1" style="background-image:url();background-size:cover;background-position:center;">
-<div class="hero-placeholder" id="hero-ph-1">
-
-</div>
-</div>
-<div class="hero-content hero-content--social">
-<p class="hero-eyebrow">Únete a nuestra comunidad</p>
-<p class="hero-h1" style="font-size:clamp(2rem,4vw,3.8rem)">SÍGUENOS EN<br/>REDES.</p>
-<div class="hero-rule"><span class="hero-rule-heart">♥</span></div>
-<p class="hero-sub" style="margin-bottom:32px">Descubre looks, nuevos drops<br/>y contenido exclusivo.</p>
-<div class="slide-social-grid">
-<!-- Instagram -->
-<a class="slide-social-card" href="https://www.instagram.com/stilosrdjeans?igsh=MTFtY3d1eHoxMWV3bg==" id="slide-ig" target="_blank">
-<div class="ssc-icon">
-<svg fill="none" height="26" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" viewbox="0 0 24 24" width="26">
-<rect height="20" rx="5" width="20" x="2" y="2"></rect>
-<circle cx="12" cy="12" r="4.5"></circle>
-<circle cx="17.5" cy="6.5" fill="currentColor" r="1" stroke="none"></circle>
-</svg>
-</div>
-<div class="ssc-info">
-<b>Instagram</b>
-<span>@stilosrdjeans</span>
-</div>
-</a>
-<!-- Facebook -->
-<a class="slide-social-card" href="https://www.facebook.com/profile.php?id=61574894803320" id="slide-fb" target="_blank">
-<div class="ssc-icon">
-<svg fill="currentColor" height="26" viewbox="0 0 24 24" width="26">
-<path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
-</svg>
-</div>
-<div class="ssc-info">
-<b>Facebook</b>
-<span>Raw Desire Stilos</span>
-</div>
-</a>
-<!-- TikTok -->
-<a class="slide-social-card" href="https://www.tiktok.com/@stilosrdjeans?_r=1&amp;_t=ZS-961KXhOKUBp" id="slide-tk" target="_blank">
-<div class="ssc-icon">
-<svg fill="currentColor" height="26" viewbox="0 0 24 24" width="26">
-<path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.02-.06z"></path>
-</svg>
-</div>
-<div class="ssc-info">
-<b>TikTok</b>
-<span>@stilosrdjeans</span>
-</div>
-</a>
-<!-- WhatsApp -->
-<a class="slide-social-card slide-social-card--wa" href="https://wa.me/573507243351" id="slide-wa" target="_blank">
-<div class="ssc-icon">
-<svg fill="currentColor" height="26" viewbox="0 0 32 32" width="26">
-<path d="M16 1C7.716 1 1 7.716 1 16c0 2.68.696 5.195 1.914 7.378L1 31l7.82-1.88A14.94 14.94 0 0016 31c8.284 0 15-6.716 15-15S24.284 1 16 1zm6.71 20.838c-.368-.184-2.176-1.073-2.514-1.196-.337-.122-.583-.184-.828.184-.245.368-.95 1.196-1.165 1.44-.214.246-.429.276-.797.092-.368-.184-1.555-.573-2.961-1.827-1.095-.977-1.834-2.182-2.049-2.55-.214-.368-.023-.567.161-.75.166-.165.368-.43.552-.644.184-.214.245-.368.368-.613.122-.245.061-.46-.031-.644-.092-.184-.828-1.993-1.134-2.73-.299-.718-.603-.621-.828-.632l-.705-.012c-.245 0-.644.092-.981.46s-1.288 1.258-1.288 3.067 1.319 3.558 1.503 3.803c.184.245 2.596 3.966 6.29 5.562.879.38 1.565.607 2.1.777.883.281 1.687.241 2.322.146.708-.105 2.176-.889 2.483-1.748.306-.859.306-1.594.214-1.748-.092-.153-.337-.245-.705-.429z"></path>
-</svg>
-</div>
-<div class="ssc-info">
-<b>WhatsApp</b>
-<span>Haz tu pedido</span>
-</div>
-</a>
-</div>
-</div>
-</div>
-<!-- Slide 3 -->
-<div class="hero-slide" id="slide-2">
-<div class="hero-slide-bg" id="slide-bg-2" style="background-image:url();background-size:cover;background-position:center right;">
-<div class="hero-placeholder" id="hero-ph-2">
-
-</div>
-</div>
-<div class="hero-content">
-<p class="hero-eyebrow">Hecho en Colombia</p>
-<p class="hero-h1">RAW DESIRE<br/>STYLES.</p>
-<div class="hero-rule"><span class="hero-rule-heart">♥</span></div>
-<p class="hero-sub">Fabricantes directos<br/>Bogotá, Colombia.</p>
-<button class="hero-cta" onclick="document.getElementById('nosotros').scrollIntoView({behavior:'smooth'})">Conócenos</button>
-</div>
-</div>
-<!-- features strip inside hero -->
-<div class="hero-features">
-<div class="hero-feat">
-<svg fill="none" height="20" stroke="currentColor" stroke-width="1.8" viewbox="0 0 48 48" width="20">
-<rect height="14" rx="2" width="30" x="4" y="28"></rect><path d="M34 35h6l4-8H34V35z"></path><circle cx="12" cy="44" r="3"></circle><circle cx="32" cy="44" r="3"></circle>
-<path d="M4 28V14h20"></path>
-</svg>
-<div><b>Envíos a todo el país</b><span>Rápidos y seguros</span></div>
-</div>
-<div class="hero-feat-div"></div>
-<div class="hero-feat">
-<svg fill="none" height="20" stroke="currentColor" stroke-width="1.8" viewbox="0 0 48 48" width="20">
-<rect height="20" rx="2" width="24" x="12" y="22"></rect><path d="M16 22v-5a8 8 0 0116 0v5"></path>
-<circle cx="24" cy="33" fill="currentColor" r="2.5"></circle>
-</svg>
-<div><b>Pagos 100% seguros</b><span>Plataforma confiable</span></div>
-</div>
-<div class="hero-feat-div"></div>
-<div class="hero-feat">
-<svg fill="none" height="20" stroke="currentColor" stroke-width="1.8" viewbox="0 0 48 48" width="20">
-<circle cx="24" cy="24" r="18"></circle><path d="M24 16v8l5 5"></path>
-<path d="M16 10l-4-4M32 10l4-4M24 6V2"></path>
-</svg>
-<div><b>Calidad premium</b><span>Materiales seleccionados</span></div>
-</div>
-</div>
-<!-- dots -->
-<div class="hero-dots" style="bottom:80px">
-<button class="hdot on" onclick="goSlide(0)"></button>
-<button class="hdot" onclick="goSlide(1)"></button>
-<button class="hdot" onclick="goSlide(2)"></button>
-</div>
-</section>
-<!-- ══ COLECCIÓN DESTACADA ══ -->
-<section id="coleccion">
-<div class="col-head" style="padding-top:64px;padding-bottom:40px">
-<p class="col-ey">Colección</p>
-<h2 class="col-h2" style="font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:400">Elige tu estilo</h2>
-<div class="col-rule"></div>
-</div>
-<div class="col-cats-scroll-wrap">
-<div class="col-cats-row" id="col-cats-row">
-<!-- filled by JS renderCatHighlights() -->
-</div>
-</div>
-<div class="col-more" style="padding-bottom:64px">
-<button class="btn-outline-gold" onclick="document.getElementById('tienda').scrollIntoView({behavior:'smooth'})">Ver toda la colección</button>
-</div>
+<div class="vd-grid" id="vendido-grid"></div>
 </section>
 <!-- ══ LO + NUEVO ══ -->
 <section id="nuevo" style="display:none">
 <div class="sec-hd">
 <div>
-<p class="sec-ey">Recién llegado</p>
-<h2 class="sec-title">Lo + Nuevo</h2>
+<h2 class="sec-title">Novedades</h2>
 </div>
 <button class="ver-btn" onclick="document.getElementById('tienda').scrollIntoView({behavior:'smooth'})">Ver todo</button>
 </div>
-<div class="scroll-row">
-<button class="sarr L" id="nL" onclick="scrollN(-1)">←</button>
-<div class="scroll-track" id="nuevo-scroll"></div>
-<button class="sarr R" id="nR" onclick="scrollN(1)">→</button>
+<div class="hs-wrap" id="hs-nuevo">
+<button class="hs-arrow hs-l" onclick="hsGo('hs-nuevo',-1)" aria-label="Anterior">‹</button>
+<div class="hs-track" id="nuevo-scroll"></div>
+<button class="hs-arrow hs-r" onclick="hsGo('hs-nuevo',1)" aria-label="Siguiente">›</button>
 </div>
 </section>
-<!-- ══ SOBRE NOSOTROS ══ -->
-<section id="nosotros">
-<div class="nos-left">
-<!-- background image or logo placeholder -->
-<img alt="Fondo sección nosotros Raw Desire Stilos" class="nos-left-bg" id="nos-bg-img" src="" style="display:none"/>
-<div class="nos-left-overlay" id="nos-overlay" style="display:none"></div>
-<div class="nos-logo-ph" id="nos-logo-ph">
-<svg style="width:min(200px,38%);opacity:.55;position:relative;z-index:1" viewbox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-<circle cx="100" cy="100" fill="none" r="96" stroke="#3b82f6" stroke-dasharray="6 4" stroke-width="1.5"></circle>
-<circle cx="100" cy="100" fill="none" opacity=".5" r="76" stroke="#3b82f6" stroke-width="0.8"></circle>
-<text fill="#3b82f6" font-family="'Cormorant Garamond',serif" font-size="18" font-style="italic" letter-spacing="2" text-anchor="middle" x="100" y="88">Raw Desire</text>
-<text fill="#3b82f6" font-family="'Montserrat',sans-serif" font-size="9" font-weight="300" letter-spacing="8" text-anchor="middle" x="100" y="110">STILOS</text>
-<line opacity=".6" stroke="#3b82f6" stroke-width="0.8" x1="62" x2="138" y1="120" y2="120"></line>
-<text fill="#3b82f6" font-family="'Montserrat',sans-serif" font-size="6.5" letter-spacing="5" opacity=".7" text-anchor="middle" x="100" y="136">JEANS</text>
-</svg>
+<!-- ══ COLECCIÓN DESTACADA ══ -->
+<section id="coleccion">
+<div class="col-head" style="padding-top:64px;padding-bottom:40px">
+<h2 class="col-h2" style="font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:400">Explora por categorías</h2>
+<div class="col-rule"></div>
 </div>
+<div class="hs-wrap" id="hs-cats">
+<button class="hs-arrow hs-l" onclick="hsGo('hs-cats',-1)" aria-label="Anterior">‹</button>
+<div class="col-cats-row hs-track" id="col-cats-row"></div>
+<button class="hs-arrow hs-r" onclick="hsGo('hs-cats',1)" aria-label="Siguiente">›</button>
 </div>
-<div class="nos-right">
-<div class="nos-main">
-<p class="nos-ey">Sobre Nosotros</p>
-<div class="nos-h2">
-<b>Más que jeans,</b>
-<em>una actitud.</em>
-</div>
-<p class="nos-text">En Raw Desire Stilos creemos que la moda es una forma de expresión. Diseñamos jeans que se adaptan a ti, a tu cuerpo y a tu esencia.</p>
-<button class="nos-cta" onclick="document.getElementById('nosotros').scrollIntoView({behavior:'smooth'})">Conócenos</button>
-</div>
-<div class="nos-features">
-<div class="nos-feat">
-<div class="nos-feat-icon">✦</div>
-<div class="nos-feat-text">
-<b>Diseños exclusivos</b>
-<span>Pensados para ti</span>
-</div>
-</div>
-<div class="nos-feat">
-<div class="nos-feat-icon">♥</div>
-<div class="nos-feat-text">
-<b>Hechos con pasión</b>
-<span>Cada detalle importa</span>
-</div>
-</div>
-<div class="nos-feat">
-<div class="nos-feat-icon">★</div>
-<div class="nos-feat-text">
-<b>Para mujeres reales</b>
-<span>Como tú</span>
-</div>
-</div>
-</div>
+<div class="col-more" style="padding-bottom:64px">
+<button class="btn-outline-gold" onclick="document.getElementById('tienda').scrollIntoView({behavior:'smooth'})">Ver todos los productos</button>
 </div>
 </section>
 <!-- ══ TIENDA COMPLETA ══ -->
@@ -301,21 +132,76 @@
 <div class="tienda-head">
 <p class="sec-ey" style="display:flex;align-items:center;justify-content:center;gap:12px;color:var(--accent)">
 <span style="display:block;width:28px;height:1px;background:var(--accent)"></span>
-      Raw Desire Stilos
+      Yibex Store
       <span style="display:block;width:28px;height:1px;background:var(--accent)"></span>
 </p>
-<h2 style="font-family:'Playfair Display',serif;font-size:clamp(1.8rem,3vw,2.8rem);font-weight:700;color:#fff;letter-spacing:.04em;margin-top:8px">Nuestra Tienda</h2>
+<h2 style="font-family:'Playfair Display',serif;font-size:clamp(1.8rem,3vw,2.8rem);font-weight:700;color:#fff;letter-spacing:.04em;margin-top:8px">Nuestro catálogo</h2>
 </div>
 <div class="tienda-tabs" id="tienda-tabs"></div>
 <div id="tienda-blocks"></div>
+</section>
+</div>
+<div id="view-nosotros" style="display:none">
+<div class="nos-page-hd"><button class="nos-back" onclick="goTo('home')">← Volver al catálogo</button></div>
+<!-- ══ SOBRE NOSOTROS ══ -->
+<section id="nosotros">
+<div class="nos-left">
+<!-- background image or logo placeholder -->
+<img alt="Fondo sección nosotros Yibex Store" class="nos-left-bg" id="nos-bg-img" src="" style="display:none"/>
+<div class="nos-left-overlay" id="nos-overlay" style="display:none"></div>
+<div class="nos-logo-ph" id="nos-logo-ph">
+<img alt="Yibex Store" src="assets/logo.png" style="width:min(260px,52%);border-radius:50%;position:relative;z-index:1"/>
+</div>
+</div>
+<div class="nos-right">
+<div class="nos-main">
+<p class="nos-ey">Sobre Nosotros</p>
+<div class="nos-h2">
+<b>Más que una tienda,</b>
+<em>tu lugar de compras.</em>
+</div>
+<p class="nos-text">En Yibex Store encontrarás de todo en un solo lugar: hogar, salud, maquillaje, belleza (planchas y secadores), herramientas, juguetería, parlantería y más. Mira el catálogo, elige lo que te guste y pídelo directo por WhatsApp.</p>
+<ul class="nos-info">
+<li><b>Atención</b><span>Por WhatsApp, de 7 a. m. a 9 p. m.</span></li>
+<li><b>Ventas</b><span>100% en línea. Tenemos muchos clientes que aprueban nuestro servicio.</span></li>
+<li><b>Contraentrega</b><span>Popayán, Santa Rosa (Nariño), alrededores y Florencia (Cauca).</span></li>
+<li><b>Envíos a otras ciudades</b><span>Con Interrapidísimo: pagas el 100% del producto por adelantado y el costo del envío lo pagas al recibir.</span></li>
+<li><b>Medios de pago</b><span>Nequi, Nu Bank, Llaves o efectivo.</span></li>
+</ul>
+<a class="nos-cta" id="nos-wa" data-wa="1" href="#" target="_blank" rel="noopener">Escríbenos por WhatsApp</a>
+</div>
+<div class="nos-features">
+<div class="nos-feat">
+<div class="nos-feat-icon">✦</div>
+<div class="nos-feat-text">
+<b>Gran variedad</b>
+<span>De todo en un lugar</span>
+</div>
+</div>
+<div class="nos-feat">
+<div class="nos-feat-icon">✦</div>
+<div class="nos-feat-text">
+<b>Atención directa</b>
+<span>Te respondemos rápido</span>
+</div>
+</div>
+<div class="nos-feat">
+<div class="nos-feat-icon">★</div>
+<div class="nos-feat-text">
+<b>Buenos precios</b>
+<span>Para todos</span>
+</div>
+</div>
+</div>
+</div>
 </section>
 <!-- ══ RESEÑAS ══ -->
 <section id="resenas">
 <div class="res-inner">
 <div class="res-header">
-<p class="res-eyebrow">Lo que dicen nuestras clientas</p>
+<p class="res-eyebrow">Lo que dicen nuestros clientes</p>
 <h2 class="res-title">Opiniones reales</h2>
-<div><span class="res-counter"><span class="res-counter-stars">⭐⭐⭐⭐⭐</span> Más de 500+ clientas satisfechas</span></div>
+<div><span class="res-counter"><span class="res-counter-stars">⭐⭐⭐⭐⭐</span> Clientes satisfechos</span></div>
 </div>
 <div class="res-grid" id="res-grid"></div>
 <!-- Formulario -->
@@ -324,20 +210,21 @@
 <div class="res-form-stars" id="res-star-pick">
 <span data-v="1">★</span><span data-v="2">★</span><span data-v="3">★</span><span data-v="4">★</span><span data-v="5">★</span>
 </div>
-<div class="res-fg"><label>Tu nombre</label><input id="res-inp-name" placeholder="Ej: Camila M."/></div>
+<div class="res-fg"><label>Tu nombre</label><input id="res-inp-name" placeholder="Ej: María P."/></div>
 <div class="res-fg"><label>Tu comentario</label><textarea id="res-inp-msg" placeholder="Cuéntanos cómo te fue con tu pedido..."></textarea></div>
 <button class="res-submit" onclick="submitRes()">Publicar reseña →</button>
 <p class="res-form-note">Tu reseña se publicará después de ser aprobada.</p>
 </div>
 </div>
 </section>
+</div>
 <!-- ══ FOOTER ══ -->
 <footer>
 <div class="footer-main">
 <div class="foot-col">
-<!-- LOGO: cuando tengas el logo, cambia src por assets/logo.png y quita display:none --><img alt="Yibex Store" class="foot-logo-img" src="" style="display:none"/>
-<p class="foot-logo-name">Raw Desire</p>
-<p class="foot-logo-sub">Stilos</p>
+<img alt="Yibex Store" class="foot-logo-img" src="assets/logo.png"/>
+<p class="foot-logo-name">Yibex</p>
+<p class="foot-logo-sub">Store</p>
 </div>
 <div class="foot-col" style="padding-left:48px">
 <p class="foot-h">Suscríbete</p>
@@ -352,33 +239,33 @@
 <div class="foot-col" style="padding-left:48px">
 <p class="foot-h">Síguenos</p>
 <div class="social-row">
-<a class="social-btn" href="https://www.instagram.com/stilosrdjeans?igsh=MTFtY3d1eHoxMWV3bg==" id="social-ig" target="_blank" title="Instagram">
+<a class="social-btn" href="#" id="social-ig" target="_blank" title="Instagram">
 <svg viewbox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"></path></svg>
 </a>
-<a class="social-btn" href="https://www.facebook.com/profile.php?id=61574894803320" id="social-fb" target="_blank" title="Facebook">
+<a class="social-btn" href="#" id="social-fb" target="_blank" title="Facebook">
 <svg viewbox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"></path></svg>
 </a>
-<a class="social-btn" href="https://www.tiktok.com/@stilosrdjeans?_r=1&amp;_t=ZS-961KXhOKUBp" id="social-tk" target="_blank" title="TikTok">
+<a class="social-btn" href="#" id="social-tk" target="_blank" title="TikTok">
 <svg viewbox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"></path></svg>
 </a>
-<a class="social-btn" href="https://wa.me/573507243351" id="social-wa-f" target="_blank" title="WhatsApp">
+<a class="social-btn" href="#" id="social-wa-f" target="_blank" title="WhatsApp">
 <svg viewbox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"></path></svg>
 </a>
 </div>
-<p class="social-handle">@rawdesire.stilos</p>
+<p class="social-handle">@yibexstore</p>
 </div>
 </div>
 <div class="footer-bottom">
-<p class="footer-copy">© 2025 Raw Desire Stilos. Todos los derechos reservados.</p>
+<p class="footer-copy">© 2026 Yibex Store. Todos los derechos reservados. · v6</p>
 <div class="footer-links">
 <a href="#tienda">Tienda</a>
-<a href="#coleccion">Colección</a>
-<a href="#nosotros">Nosotros</a>
+<a href="#coleccion">Categorías</a>
+<a href="#sobre-nosotros">Nosotros</a>
 </div>
 </div>
 <div style="max-width:900px;margin:0 auto;padding:28px 24px 0;text-align:center">
-<p style="font-size:.58rem;color:rgba(255,255,255,.28);line-height:1.8;letter-spacing:.03em">
-<strong style="color:rgba(255,255,255,.35)">Raw Desire Stilos</strong> es tu tienda de jeans y ropa femenina en Colombia. Ofrecemos jeans de alta calidad en estilos skinny, wide leg, mom fit, flare, baggy y más. Nuestros jeans están diseñados para realzar tu estilo y resaltar tu esencia. Fabricantes directos desde Bogotá, Colombia — enviamos a todo el país con pagos 100% seguros. Descubre nuestra colección de jeans para mujer y encuentra el par perfecto para ti. Contáctanos por WhatsApp para hacer tu pedido o síguenos en redes sociales para ver los últimos diseños, looks y drops exclusivos. En Raw Desire Stilos creemos que cada mujer merece jeans que la hagan sentir única, cómoda y poderosa.
+<p class="foot-desc">
+<strong>Yibex Store</strong> es tu tienda en línea con productos de hogar, salud, maquillaje, belleza, herramientas, juguetería, parlantería y más. Pedidos por WhatsApp, contraentrega en Popayán, Santa Rosa (Nariño) y Florencia (Cauca), y envíos a todo el país con Interrapidísimo.
     </p>
 </div>
 <div class="footer-andro">
@@ -390,7 +277,7 @@
 </div>
 </footer>
 <!-- WA FLOAT -->
-<a class="wa-float" href="https://wa.me/573507243351" id="wa-float" rel="noopener noreferrer" target="_blank">
+<a class="wa-float" href="#" id="wa-float" rel="noopener noreferrer" target="_blank">
 <svg height="28" viewbox="0 0 32 32" width="28" xmlns="http://www.w3.org/2000/svg">
 <path d="M16 1C7.716 1 1 7.716 1 16c0 2.68.696 5.195 1.914 7.378L1 31l7.82-1.88A14.94 14.94 0 0016 31c8.284 0 15-6.716 15-15S24.284 1 16 1zm0 27.273a12.22 12.22 0 01-6.243-1.712l-.447-.266-4.638 1.116 1.162-4.51-.292-.463A12.22 12.22 0 013.727 16C3.727 9.22 9.22 3.727 16 3.727S28.273 9.22 28.273 16 22.78 28.273 16 28.273zm6.71-9.162c-.368-.184-2.176-1.073-2.514-1.196-.337-.122-.583-.184-.828.184-.245.368-.95 1.196-1.165 1.44-.214.246-.429.276-.797.092-.368-.184-1.555-.573-2.961-1.827-1.095-.977-1.834-2.182-2.049-2.55-.214-.368-.023-.567.161-.75.166-.165.368-.43.552-.644.184-.214.245-.368.368-.613.122-.245.061-.46-.031-.644-.092-.184-.828-1.993-1.134-2.73-.299-.718-.603-.621-.828-.632l-.705-.012c-.245 0-.644.092-.981.46s-1.288 1.258-1.288 3.067 1.319 3.558 1.503 3.803c.184.245 2.596 3.966 6.29 5.562.879.38 1.565.607 2.1.777.883.281 1.687.241 2.322.146.708-.105 2.176-.889 2.483-1.748.306-.859.306-1.594.214-1.748-.092-.153-.337-.245-.705-.429z" fill="#fff"></path>
 </svg>
@@ -428,6 +315,7 @@
 <span class="pdp-bar-title" id="pdp-bar-title"></span>
 <button class="pdp-bar-cart" onclick="closeM();openCart()">
 <svg stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"></path><line x1="3" x2="21" y1="6" y2="6"></line><path d="M16 10a4 4 0 01-8 0"></path></svg>
+<span class="cart-bubble">0</span>
 </button>
 </div>
 <!-- Product main -->
@@ -435,24 +323,19 @@
 <!-- Image -->
 <div class="pdp-img-wrap" id="pdp-img-wrap">
 <span class="pdp-badge-new" id="pdp-badge-new" style="display:none">NUEVO</span>
-<button class="pdp-heart" id="pdp-heart" onclick="this.classList.toggle('liked');this.textContent=this.classList.contains('liked')?'♥':'♡'">♡</button>
 </div>
 <!-- Info -->
 <div class="pdp-info">
 <h2 class="pdp-name" id="pdp-name"></h2>
 <div class="pdp-price-block">
 <div>
-<div class="pdp-price-detal-label">Precio detal</div>
+<div class="pdp-price-old" id="pdp-price-old" style="display:none"></div>
 <div class="pdp-price-detal" id="pdp-price-detal"></div>
 </div>
-<div class="pdp-price-mayor-box" id="pdp-price-mayor-box" style="display:none">
-<div class="pdp-price-mayor-label">Precio mayorista</div>
-<div class="pdp-price-mayor-val" id="pdp-price-mayor-val"></div>
+<span class="pdp-promo-badge" id="pdp-promo-badge" style="display:none"></span>
 </div>
-</div>
-<div id="pdp-sizes-wrap" style="display:none">
-<div class="pdp-sizes-label">Tallas disponibles: <span id="pdp-sizes-range"></span></div>
-</div>
+<span class="pdp-tag" id="pdp-tag" style="display:none"></span>
+<div class="pdp-desc" id="pdp-desc" style="display:none"></div>
 <div class="pdp-actions">
 <button class="pdp-btn-cart" id="pdp-btn-cart">
 <svg viewbox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"></path><line x1="3" x2="21" y1="6" y2="6"></line><path d="M16 10a4 4 0 01-8 0"></path></svg>
@@ -460,7 +343,7 @@
         </button>
 <button class="pdp-btn-wa" id="pdp-btn-wa">
 <svg viewbox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"></path></svg>
-          Pedir ahora
+          Pedir por WhatsApp
         </button>
 </div>
 </div>
@@ -468,7 +351,7 @@
 <!-- Recommended -->
 <div class="pdp-rec" id="pdp-rec">
 <div style="max-width:900px;margin:0 auto">
-<p class="pdp-rec-title">También te puede interesar...</p>
+<p class="pdp-rec-title">Productos recomendados</p>
 <div class="pdp-rec-grid" id="pdp-rec-grid"></div>
 </div>
 </div>
@@ -492,7 +375,7 @@
 </svg>
 </div>
 <h2>Panel Admin</h2>
-<p>Raw Desire Stilos · Acceso restringido</p>
+<p>Yibex Store · Acceso restringido</p>
 <div class="adm-err" id="adm-err">Contraseña incorrecta. Intenta de nuevo.</div>
 <input id="adm-pwd" onkeydown="if(event.key==='Enter')chkP()" placeholder="••••••••" type="password"/>
 <button class="adm-in" onclick="chkP()">Ingresar al Panel</button>
@@ -513,7 +396,7 @@
 <path d="M16 8 Q17 6 18.5 7" stroke-width="1.2"></path>
 </svg>
 </div>
-<h2>Raw Desire Stilos · Admin</h2>
+<h2>Yibex Store · Admin</h2>
 </div>
 <button class="adm-ghost-btn" onclick="closeAdm()">✕ Salir</button>
 </div>
@@ -527,7 +410,7 @@
 <span class="adm-tab-icon">🗂</span>
 <span class="adm-tab-label">Categorías</span>
 </button>
-<button class="adm-tab" onclick="swT('media',this)">
+<button class="adm-tab" onclick="swT('media',this)" style="display:none">
 <span class="adm-tab-icon">🖼</span>
 <span class="adm-tab-label">Imágenes</span>
 </button>
@@ -546,43 +429,45 @@
 <div class="fgd">
 <div class="fg2 ffw">
 <label>Nombre del producto</label>
-<input id="f-nm" placeholder="Ej: Skinny Negro Tiro Alto"/>
+<input id="f-nm" placeholder="Ej: Audífonos Bluetooth"/>
 </div>
 <div class="fg2">
-<label>💰 Precio detal <span style="color:#ff6b6b">*</span></label>
+<label>💰 Precio <span style="color:#ff6b6b">*</span></label>
 <input id="f-px" placeholder="Ej: 65000" type="number"/>
 </div>
 <div class="fg2">
-<label>🏷 Precio mayoristas</label>
-<input id="f-pm" placeholder="Ej: 48000" type="number"/>
-</div>
-<div class="fg2">
-<label>Talla disponible desde</label>
-<input id="f-sz-from" placeholder="Ej: 6 o S" type="text"/>
-</div>
-<div class="fg2">
-<label>Talla disponible hasta</label>
-<input id="f-sz-to" placeholder="Ej: 16 o XL" type="text"/>
+<label>Disponibilidad</label>
+<select id="f-av"><option value="1">Disponible</option><option value="0">Agotado</option></select>
 </div>
 <div class="fg2">
 <label>Categoría (sección donde aparece)</label>
 <select id="f-ct"></select>
 </div>
 <div class="fg2 ffw">
+<label>Descripción del producto</label>
+<textarea id="f-desc" rows="4" maxlength="1200" placeholder="Características, medidas, qué incluye..."></textarea>
+</div>
+<div class="fg2 ffw">
+<label>Palabras clave para el buscador (opcional)</label>
+<input id="f-kwd" maxlength="120" placeholder="Ej: cargador, usb, celular"/>
+</div>
+<div class="fg2 ffw">
 <label>📸 Foto del producto</label>
 <div id="prod-crop-mount"></div>
 </div>
 </div>
-<button class="adm-add-btn" onclick="addP()">
+<button class="adm-add-btn" id="btn-add-prod" onclick="addP()">
 <svg fill="none" stroke="currentColor" stroke-width="2.5" viewbox="0 0 24 24"><line x1="12" x2="12" y1="5" y2="19"></line><line x1="5" x2="19" y1="12" y2="12"></line></svg>
         Agregar Producto
       </button>
 <!-- Inventory -->
 <div style="margin-top:28px">
 <div class="adm-sec-title"><h3>Inventario actual</h3></div>
+<div style="display:flex;gap:8px;margin-bottom:12px"><input id="adm-srch" placeholder="Buscar producto por nombre..." onkeydown="if(event.key==='Enter')admSearch()" style="flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:#fff;padding:10px 12px;border-radius:6px;font-size:.75rem"/><button class="adm-ghost-btn" onclick="admSearch()" style="padding:10px 16px">Buscar</button></div>
+<div class="adm-bulk"><label><input type="checkbox" id="adm-selall" onchange="admSelAll(this.checked)"/> Seleccionar todos</label><button class="xb d adm-del" id="adm-bulk-del" style="display:none" onclick="delSelected()">🗑 Eliminar seleccionados (<span id="adm-sel-n">0</span>)</button></div>
 <div class="adm-table">
 <div class="adm-table-hdr">
-<span>Foto</span><span>Producto</span><span>Tallas · Precio</span><span>Categ.</span><span>Acción</span>
+<span>Foto</span><span>Producto</span><span>Precio</span><span>Estado</span><span>Acción</span>
 </div>
 <div id="adm-pl"></div>
 </div>
@@ -590,6 +475,7 @@
 </div>
 <!-- ── TAB: CATEGORÍAS ── -->
 <div class="atc" id="tab-cats">
+<div id="cv-list">
 <div class="adm-sec-title"><h3>Secciones de la tienda</h3></div>
 <p style="font-size:.66rem;color:rgba(255,255,255,.3);margin-bottom:20px;line-height:1.7">
         Cada categoría aparece como sección en la tienda y en colección destacada.<br/>
@@ -601,7 +487,30 @@
 <svg fill="none" stroke="currentColor" stroke-width="2.5" viewbox="0 0 24 24"><line x1="12" x2="12" y1="5" y2="19"></line><line x1="5" x2="19" y1="12" y2="12"></line></svg>
           Nueva Categoría
         </button>
-<button class="adm-ghost-btn" onclick="saveCats()" style="flex:1;min-width:140px">✔ Guardar Cambios</button>
+<button class="adm-ghost-btn" id="btn-save-cats" onclick="saveCats()" style="flex:1;min-width:140px;display:none">✔ Guardar Cambios</button>
+</div>
+</div>
+<!-- ── VISTA DE UNA CATEGORÍA ── -->
+<div id="cv" style="display:none">
+<button class="adm-ghost-btn" onclick="cvClose()">← Volver a categorías</button>
+<div class="adm-sec-title" style="margin-top:16px"><h3 id="cv-title"></h3></div>
+<p id="cv-count" style="font-size:.66rem;color:rgba(255,255,255,.3);margin-bottom:14px"></p>
+<div style="display:flex;gap:10px;flex-wrap:wrap">
+<button class="adm-add-btn" id="cv-btn-files" onclick="document.getElementById('cv-files').click()" style="flex:1;min-width:140px">📸 Importar fotos</button>
+<button class="adm-add-btn" id="cv-btn-folder" onclick="document.getElementById('cv-folder').click()" style="flex:1;min-width:140px">📂 Importar carpeta</button>
+</div>
+<input id="cv-files" type="file" accept="image/*" multiple style="display:none" onchange="cvImport(this)"/>
+<input id="cv-folder" type="file" webkitdirectory multiple style="display:none" onchange="cvImport(this)"/>
+<div id="cv-status" style="margin-top:10px;font-size:.75rem;opacity:.8"></div>
+<div style="margin-top:22px">
+<div class="adm-bulk"><label><input type="checkbox" id="cv-selall" onchange="cvSelAll(this.checked)"/> Seleccionar todos</label><button class="xb d adm-del" id="cv-bulk-del" style="display:none" onclick="cvDelSel()">🗑 Eliminar seleccionados (<span id="cv-sel-n">0</span>)</button></div>
+<div class="adm-table">
+<div class="adm-table-hdr">
+<span>Foto</span><span>Producto</span><span>Precio</span><span>Estado</span><span>Acción</span>
+</div>
+<div id="cv-pl"></div>
+</div>
+</div>
 </div>
 </div>
 <!-- ── TAB: IMÁGENES ── -->
@@ -639,49 +548,38 @@
 <p class="cfg-item-title">📱 WhatsApp de pedidos</p>
 <div class="fg2">
 <label>Número (con código de país, sin +)</label>
-<input id="cfg-wa" placeholder="573507243351"/>
+<input id="cfg-wa" placeholder="Con indicativo, sin + ni espacios. Ej: 573001234567"/>
 </div>
 </div>
 <div class="cfg-item">
 <p class="cfg-item-title">📸 Instagram</p>
 <div class="fg2">
 <label>Link completo</label>
-<input id="cfg-ig" placeholder="https://www.instagram.com/stilosrdjeans..."/>
+<input id="cfg-ig" placeholder="https://www.instagram.com/tu_usuario"/>
 </div>
 </div>
 <div class="cfg-item">
 <p class="cfg-item-title">👍 Facebook</p>
 <div class="fg2">
 <label>Link completo</label>
-<input id="cfg-fb" placeholder="https://www.facebook.com/profile.php?id=..."/>
+<input id="cfg-fb" placeholder="https://www.facebook.com/tu_pagina"/>
 </div>
 </div>
 <div class="cfg-item">
 <p class="cfg-item-title">🎵 TikTok</p>
 <div class="fg2">
 <label>Link completo</label>
-<input id="cfg-tk" placeholder="https://www.tiktok.com/@stilosrdjeans..."/>
+<input id="cfg-tk" placeholder="https://www.tiktok.com/@tu_usuario"/>
 </div>
 </div>
-<div class="cfg-item">
-<p class="cfg-item-title">🏷 Texto de portada (hero)</p>
-<div class="fg2" style="margin-bottom:10px">
-<label>Título principal</label>
-<input id="cfg-h1" placeholder="EMPODÉRATE CON TU ESTILO."/>
-</div>
-<div class="fg2">
-<label>Subtítulo</label>
-<input id="cfg-sub" placeholder="Jeans que realzan tu esencia."/>
-</div>
-</div>
-<button class="adm-add-btn" onclick="saveCfg()" style="max-width:240px">✔ Guardar Configuración</button>
+<button class="adm-add-btn" id="btn-save-cfg" onclick="saveCfg()" style="max-width:240px;display:none">✔ Guardar Configuración</button>
 </div>
 </div>
 <!-- ── TAB: RESEÑAS ── -->
 <div class="atc" id="tab-resenas">
 <div class="adm-sec-title"><h3>Gestión de reseñas</h3></div>
 <p style="font-size:.66rem;color:rgba(255,255,255,.3);margin-bottom:20px;line-height:1.7">
-        Aquí puedes ver y eliminar los comentarios de las clientas.<br/>
+        Aquí puedes ver y eliminar los comentarios de los clientes.<br/>
         Las reseñas enviadas por el formulario aparecen como "pendientes".
       </p>
 <div id="adm-res-list"></div>
@@ -697,21 +595,37 @@
 </div>
 <div class="em-body">
 <input id="e-id" type="hidden"/>
-<div class="fg2"><label>Nombre del producto</label><input id="e-nm"/></div>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-<div class="fg2"><label>💰 Precio detal</label><input id="e-px" type="number"/></div>
-<div class="fg2"><label>🏷 Precio mayorista</label><input id="e-pm" placeholder="Opcional" type="number"/></div>
+<div class="fgd">
+<div class="fg2 ffw">
+<label>Nombre del producto</label>
+<input id="e-nm" placeholder="Ej: Audífonos Bluetooth"/>
 </div>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-<div class="fg2"><label>Talla desde</label><input id="e-sz-from" placeholder="Ej: 6"/></div>
-<div class="fg2"><label>Talla hasta</label><input id="e-sz-to" placeholder="Ej: 16"/></div>
+<div class="fg2">
+<label>💰 Precio <span style="color:#ff6b6b">*</span></label>
+<input id="e-px" placeholder="Ej: 65000" type="number"/>
 </div>
-<div class="fg2"><label>Categoría</label><select id="e-ct"></select></div>
+<div class="fg2">
+<label>Disponibilidad</label>
+<select id="e-av"><option value="1">Disponible</option><option value="0">Agotado</option></select>
+</div>
+<div class="fg2">
+<label>Categoría (sección donde aparece)</label>
+<select id="e-ct"></select>
+</div>
+<div class="fg2 ffw">
+<label>Descripción del producto</label>
+<textarea id="e-desc" rows="4" maxlength="1200" placeholder="Características, medidas, qué incluye..."></textarea>
+</div>
+<div class="fg2 ffw">
+<label>Palabras clave para el buscador (opcional)</label>
+<input id="e-kwd" maxlength="120" placeholder="Ej: cargador, usb, celular"/>
+</div>
+</div>
 <div class="fg2">
 <label>📸 Foto del producto (relación 3:4)</label>
 <div id="edit-crop-mount"></div>
 </div>
-<button class="adm-add-btn" onclick="saveEM()">✔ Guardar Cambios</button>
+<button class="adm-add-btn" id="btn-save-em" onclick="saveEM()" style="display:none">✔ Guardar Cambios</button>
 </div>
 </div>
 </div>

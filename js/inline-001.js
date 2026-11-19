@@ -4,7 +4,7 @@
 //  SIN Storage — imágenes guardadas en Firestore
 // ══════════════════════════════════════════════════════
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, getDocs, onSnapshot, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, getDocs, onSnapshot, addDoc, query, where, limit, startAfter, arrayUnion, getCountFromServer } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 const firebaseConfig = {
@@ -21,7 +21,7 @@ const db    = getFirestore(fbApp);
 const auth  = getAuth(fbApp);
 
 // ── Expose Firebase utilities globally ──
-window._fb = { db, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, getDocs, onSnapshot, addDoc, auth, signInWithEmailAndPassword, signOut };
+window._fb = { db, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, getDocs, onSnapshot, addDoc, query, where, limit, startAfter, arrayUnion, getCountFromServer, auth, signInWithEmailAndPassword, signOut };
 
 // ══════════════════════════════════════════════════════
 //  IMAGEN: comprimir base64 a ~80KB antes de guardar en Firestore
@@ -45,7 +45,7 @@ function compressForFirestore(dataUrl, maxW, maxH, quality){
   });
 }
 // Para productos: máx 600×800px (3:4), calidad 0.88 → ~120-200KB
-window._compressProd = (dataUrl)=>compressForFirestore(dataUrl, 600, 800, 0.88);
+window._compressProd = (dataUrl)=>compressForFirestore(dataUrl, 480, 640, 0.8);
 // Para sliders: máx 1920×1080px (16:9), calidad 0.88 → ~300-700KB
 window._compressSlide = (dataUrl)=>compressForFirestore(dataUrl, 1920, 1080, 0.88);
 // Para categorías: máx 480×640px (3:4), calidad 0.85
@@ -59,16 +59,6 @@ window._fbDeleteImg = async ()=>{};
 //  REAL-TIME LISTENERS
 // ══════════════════════════════════════════════════════
 async function startListeners(){
-  // 1. PRODUCTOS — tiempo real
-  onSnapshot(collection(db,'products'), snap=>{
-    prods = [];
-    snap.forEach(d=>{ prods.push({...d.data(), _fbId: d.id}); });
-    prods.sort((a,b)=>new Date(b.dateAdded)-new Date(a.dateAdded));
-    renderNuevo();
-    renderTienda();
-    renderAPL();
-  });
-
   // 2. CATEGORÍAS — tiempo real
   onSnapshot(doc(db,'config','cats'), snap=>{
     if(snap.exists()){
@@ -101,9 +91,10 @@ async function startListeners(){
 
 function applyConfig(){
   try{
-    const wa = site.wa||'573507243351';
+    const wa = site.wa||'';
     const waFloat = document.getElementById('wa-float');
-    if(waFloat) waFloat.href = `https://wa.me/${wa}`;
+    if(waFloat) waFloat.href = wa?`https://wa.me/${wa}`:'#';
+    document.querySelectorAll('[data-wa]').forEach(e=>{e.href=wa?`https://wa.me/${wa}`:'#';});
     for(let i=0;i<3;i++){ if(site['slide'+i]) applySlide(i, site['slide'+i], site['slidePos'+i]||'center center'); }
     if(site.h1){ const el=document.getElementById('hero-h1'); if(el) el.innerHTML=site.h1.split('\n').join('<br>'); }
     if(site.sub){ const el=document.getElementById('hero-sub'); if(el) el.innerHTML=site.sub.split('\n').join('<br>'); }
@@ -130,11 +121,10 @@ async function fbInit(){
     if(siteSnap.exists()){ site = siteSnap.data()||{}; }
     applyConfig();
 
-    // Productos
-    const prodsSnap = await getDocs(collection(db,'products'));
+    // Productos: carga paginada (24 por página), ver catalogInit() en inline-002.js
     prods = [];
-    prodsSnap.forEach(d=>{ prods.push({...d.data(), _fbId: d.id}); });
-    prods.sort((a,b)=>new Date(b.dateAdded)-new Date(a.dateAdded));
+    Object.keys(pgs).forEach(k=>delete pgs[k]);
+    await catalogInit();
 
     // Reseñas
     const revSnap = await getDocs(collection(db,'reviews'));
@@ -144,8 +134,10 @@ async function fbInit(){
     // Renderizar todo
     renderCatHighlights();
     renderNuevo();
+    renderVendido();
     renderTienda();
     popSels();
+    openLinkedProduct();
     updC();
     renderResenas();
     renderAPL();
