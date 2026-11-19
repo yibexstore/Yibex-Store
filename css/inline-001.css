@@ -1870,5 +1870,8 @@ nav.nav.hd.scrolled .hd-logo{width:46px;height:46px}
 
 /* ── v9 · header: se oculta al bajar y reaparece al subir un poco ── */
 html,body{overflow-x:clip}               /* 'hidden' rompía el position:sticky del header */
-nav.nav.hd{position:sticky;top:0;z-index:900;transition:transform .28s ease,height .3s,background .3s}
+nav.nav.hd{position:fixed;top:0;left:0;right:0;z-index:900;transition:transform .28s ease,height .3s,background .3s}
+/* fijo = funciona en todos los celulares; el espacio que ocupa el header lo calcula el JS (valor inicial aquí) */
+body{padding-top:76px}
+@media(max-width:899px){body{padding-top:64px}}
 nav.nav.hd.nav-hidden{transform:translateY(-100%)}

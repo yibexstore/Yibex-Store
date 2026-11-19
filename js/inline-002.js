@@ -1781,6 +1781,10 @@ document.addEventListener('pointerup',e=>{const t=e.target;if(t&&t.closest&&t.cl
 (function(){
   const nav=document.getElementById('nav');if(!nav)return;
   let last=window.scrollY,ticking=false;
+  // el header es fixed: el body reserva su altura (igual que antes, cuando ocupaba espacio en la página)
+  const pad=()=>{document.body.style.paddingTop=nav.offsetHeight+'px';};
+  pad();window.addEventListener('resize',pad);window.addEventListener('load',pad);
+  if(window.ResizeObserver)new ResizeObserver(pad).observe(nav);
   function update(){
     const y=window.scrollY,d=y-last;
     if(y<80){nav.classList.remove('nav-hidden');}
