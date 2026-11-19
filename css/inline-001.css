@@ -1875,3 +1875,10 @@ nav.nav.hd{position:fixed;top:0;left:0;right:0;z-index:900;transition:transform 
 body{padding-top:76px}
 @media(max-width:899px){body{padding-top:64px}}
 nav.nav.hd.nav-hidden{transform:translateY(-100%)}
+
+/* ── v9 · categorías en PC: filas de 5, centradas, sin carrusel (celular no cambia) ── */
+@media(min-width:900px){
+  #coleccion .col-cats-row{flex-wrap:wrap;justify-content:center;overflow:visible;row-gap:28px;column-gap:var(--gap);padding:8px 0 18px;scroll-snap-type:none}
+  #coleccion .col-cats-row>.col-cat-item{flex:0 0 calc((100% - 4*var(--gap))/5);max-width:calc((100% - 4*var(--gap))/5)}
+  #coleccion .hs-arrow{display:none!important}
+}
