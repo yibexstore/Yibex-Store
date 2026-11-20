@@ -4,7 +4,7 @@
 //  SIN Storage — imágenes guardadas en Firestore
 // ══════════════════════════════════════════════════════
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, getDocs, onSnapshot, addDoc, query, where, limit, startAfter, arrayUnion, getCountFromServer } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, getDocs, onSnapshot, addDoc, query, where, limit, startAfter, arrayUnion, getCountFromServer, orderBy, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 const firebaseConfig = {
@@ -21,7 +21,7 @@ const db    = getFirestore(fbApp);
 const auth  = getAuth(fbApp);
 
 // ── Expose Firebase utilities globally ──
-window._fb = { db, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, getDocs, onSnapshot, addDoc, query, where, limit, startAfter, arrayUnion, getCountFromServer, auth, signInWithEmailAndPassword, signOut };
+window._fb = { db, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, getDocs, onSnapshot, addDoc, query, where, limit, startAfter, arrayUnion, getCountFromServer, orderBy, writeBatch, auth, signInWithEmailAndPassword, signOut };
 
 // ══════════════════════════════════════════════════════
 //  IMAGEN: comprimir base64 a ~80KB antes de guardar en Firestore
@@ -65,6 +65,7 @@ async function startListeners(){
       const data = snap.data();
       if(data && data.list) cats = data.list;
     }
+    if(typeof loadCatCounts==='function')loadCatCounts();
     renderCatHighlights();
     renderTienda();
     renderCE();
@@ -77,15 +78,6 @@ async function startListeners(){
       site = snap.data()||{};
       applyConfig();
     }
-  });
-
-  // 4. RESEÑAS — tiempo real
-  onSnapshot(collection(db,'reviews'), snap=>{
-    reviews = [];
-    snap.forEach(d=>{ reviews.push({...d.data(), id: d.id}); });
-    reviews.sort((a,b)=>new Date(b.date)-new Date(a.date));
-    renderResenas();
-    renderAdmRes();
   });
 }
 
@@ -126,11 +118,6 @@ async function fbInit(){
     Object.keys(pgs).forEach(k=>delete pgs[k]);
     await catalogInit();
 
-    // Reseñas
-    const revSnap = await getDocs(collection(db,'reviews'));
-    reviews=[]; revSnap.forEach(d=>reviews.push({...d.data(), id:d.id}));
-    reviews.sort((a,b)=>new Date(b.date)-new Date(a.date));
-
     // Renderizar todo
     renderCatHighlights();
     renderNuevo();
@@ -139,9 +126,7 @@ async function fbInit(){
     popSels();
     openLinkedProduct();
     updC();
-    renderResenas();
     renderAPL();
-    initResStars();
 
     // Arrancar escuchas en tiempo real
     startListeners();

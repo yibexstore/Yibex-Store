@@ -195,28 +195,6 @@
 </div>
 </div>
 </section>
-<!-- ══ RESEÑAS ══ -->
-<section id="resenas">
-<div class="res-inner">
-<div class="res-header">
-<p class="res-eyebrow">Lo que dicen nuestros clientes</p>
-<h2 class="res-title">Opiniones reales</h2>
-<div><span class="res-counter"><span class="res-counter-stars">⭐⭐⭐⭐⭐</span> Clientes satisfechos</span></div>
-</div>
-<div class="res-grid" id="res-grid"></div>
-<!-- Formulario -->
-<div class="res-form-wrap">
-<p class="res-form-title">¿Ya compraste con nosotros? ¡Cuéntanos tu experiencia!</p>
-<div class="res-form-stars" id="res-star-pick">
-<span data-v="1">★</span><span data-v="2">★</span><span data-v="3">★</span><span data-v="4">★</span><span data-v="5">★</span>
-</div>
-<div class="res-fg"><label>Tu nombre</label><input id="res-inp-name" placeholder="Ej: María P."/></div>
-<div class="res-fg"><label>Tu comentario</label><textarea id="res-inp-msg" placeholder="Cuéntanos cómo te fue con tu pedido..."></textarea></div>
-<button class="res-submit" onclick="submitRes()">Publicar reseña →</button>
-<p class="res-form-note">Tu reseña se publicará después de ser aprobada.</p>
-</div>
-</div>
-</section>
 </div>
 <!-- ══ FOOTER ══ -->
 <footer>
@@ -225,16 +203,6 @@
 <img alt="Yibex Store" class="foot-logo-img" src="assets/logo.png"/>
 <p class="foot-logo-name">Yibex</p>
 <p class="foot-logo-sub">Store</p>
-</div>
-<div class="foot-col" style="padding-left:48px">
-<p class="foot-h">Suscríbete</p>
-<p class="foot-sub-desc">Recibe novedades, lanzamientos y promociones exclusivas.</p>
-<div class="foot-email-row">
-<input id="foot-email" placeholder="Tu correo electrónico" type="email"/>
-<button class="foot-email-btn" onclick="subscribeEmail()">
-<svg stroke-width="1.5" viewbox="0 0 16 16"><line x1="0" x2="13" y1="8" y2="8"></line><polyline points="7,2 13,8 7,14"></polyline></svg>
-</button>
-</div>
 </div>
 <div class="foot-col" style="padding-left:48px">
 <p class="foot-h">Síguenos</p>
@@ -418,10 +386,6 @@
 <span class="adm-tab-icon">⚙️</span>
 <span class="adm-tab-label">Configuración</span>
 </button>
-<button class="adm-tab" onclick="swT('resenas',this)">
-<span class="adm-tab-icon">💬</span>
-<span class="adm-tab-label">Reseñas</span>
-</button>
 </div>
 <!-- ── TAB: PRODUCTOS ── -->
 <div class="atc on" id="tab-prods">
@@ -463,6 +427,7 @@
 <!-- Inventory -->
 <div style="margin-top:28px">
 <div class="adm-sec-title"><h3>Inventario actual</h3></div>
+<div id="mix-box" style="margin-bottom:12px"></div>
 <div style="display:flex;gap:8px;margin-bottom:12px"><input id="adm-srch" placeholder="Buscar producto por nombre..." onkeydown="if(event.key==='Enter')admSearch()" style="flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:#fff;padding:10px 12px;border-radius:6px;font-size:.75rem"/><button class="adm-ghost-btn" onclick="admSearch()" style="padding:10px 16px">Buscar</button></div>
 <div class="adm-bulk"><label><input type="checkbox" id="adm-selall" onchange="admSelAll(this.checked)"/> Seleccionar todos</label><button class="xb d adm-del" id="adm-bulk-del" style="display:none" onclick="delSelected()">🗑 Eliminar seleccionados (<span id="adm-sel-n">0</span>)</button></div>
 <div class="adm-table">
@@ -479,7 +444,7 @@
 <div class="adm-sec-title"><h3>Secciones de la tienda</h3></div>
 <p style="font-size:.66rem;color:rgba(255,255,255,.3);margin-bottom:20px;line-height:1.7">
         Cada categoría aparece como sección en la tienda y en colección destacada.<br/>
-        Edita el nombre, toca la imagen para cambiarla (relación 3:4).
+        Edita el nombre, toca la imagen para cambiarla y usa «Recortar / ajustar» (formato 4:5, igual que en la tienda).
       </p>
 <div class="ce" id="cat-ed"></div>
 <div style="display:flex;gap:10px;margin-top:20px;flex-wrap:wrap">
@@ -575,15 +540,6 @@
 <button class="adm-add-btn" id="btn-save-cfg" onclick="saveCfg()" style="max-width:240px;display:none">✔ Guardar Configuración</button>
 </div>
 </div>
-<!-- ── TAB: RESEÑAS ── -->
-<div class="atc" id="tab-resenas">
-<div class="adm-sec-title"><h3>Gestión de reseñas</h3></div>
-<p style="font-size:.66rem;color:rgba(255,255,255,.3);margin-bottom:20px;line-height:1.7">
-        Aquí puedes ver y eliminar los comentarios de los clientes.<br/>
-        Las reseñas enviadas por el formulario aparecen como "pendientes".
-      </p>
-<div id="adm-res-list"></div>
-</div>
 </div><!-- end adm-dash -->
 </div><!-- end adm-ov -->
 <!-- EDIT PRODUCT MODAL -->
@@ -622,7 +578,7 @@
 </div>
 </div>
 <div class="fg2">
-<label>📸 Foto del producto (relación 3:4)</label>
+<label>📸 Foto del producto (formato 4:5)</label>
 <div id="edit-crop-mount"></div>
 </div>
 <button class="adm-add-btn" id="btn-save-em" onclick="saveEM()" style="display:none">✔ Guardar Cambios</button>

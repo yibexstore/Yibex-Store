@@ -77,7 +77,7 @@ function renderCatHighlights(){
     <div class="col-cat-item" onclick="scrollToTiendaCat('${c.id}')">
       <div class="col-cat-icon" style="color:var(--accent)">
         ${c.img
-          ? `<img src="${c.img}" alt="${c.label}" style="width:100%;height:100%;object-fit:cover;object-position:center center;transform:scale(${c.imgZoom||1}) translate(${(c.imgDx||0)/(c.imgZoom||1)}px,${(c.imgDy||0)/(c.imgZoom||1)}px);transform-origin:center center;pointer-events:none">`
+          ? `<img src="${c.img}" alt="${c.label}" style="width:100%;height:100%;object-fit:cover;pointer-events:none">`
           : getCatSVG(c.label)
         }
       </div>
@@ -106,7 +106,7 @@ const CART_SVG=`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stro
 
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function pgGet(k){return pgs[k]||(pgs[k]={last:null,done:false,loading:false,ids:[],pages:[],cur:1,total:null,counting:false});}
-function tabKey(){return acT==='todo'?'__all':acT;}
+function tabKey(){return acT==='todo'?(mixOK?'__mix':'__all'):acT;}
 function ingestProd(d){
   const p={...d.data(),_fbId:d.id};
   const i=prods.findIndex(x=>x._fbId===d.id);
@@ -136,7 +136,118 @@ function newDocId(){
   return String(9999999999999-Date.now()).padStart(13,'0')+'-'+Math.random().toString(36).slice(2,6);
 }
 
+
+// ══════════════════════════════════════════════
+//  ETIQUETAS ALEATORIAS (cambian 1 vez al día) + ORDEN MEZCLADO DE "TODO"
+// ══════════════════════════════════════════════
+const TAG_PER_CAT=10;   // productos con etiqueta (Recomendado, Tendencia...) por categoría
+const NEW_PER_CAT=6;    // productos con etiqueta "Nuevo" por categoría
+let catTot={};          // cuántos productos tiene cada categoría
+let mixOK=false,mixMissing=0;
+function dayKey(){const d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();}
+function hash01(str){
+  let h=2166136261>>>0;
+  for(let i=0;i<str.length;i++){h^=str.charCodeAt(i);h=Math.imul(h,16777619)>>>0;}
+  h^=h>>>15;h=Math.imul(h,2246822519)>>>0;h^=h>>>13;h=Math.imul(h,3266489917)>>>0;h^=h>>>16;
+  return (h>>>0)/4294967296;
+}
+function dayPivot(){return hash01('pivot|'+dayKey());}
+// Devuelve {tag:'Texto'} o {isNew:true} o {} para el producto, según el día
+function dayTag(p){
+  if(!p)return{};
+  const n=catTot[p.category];
+  if(!n)return{};                       // aún no sabemos cuántos hay en la categoría
+  const id=String(p._fbId||p.id),dk=dayKey();
+  const pt=Math.min(1,TAG_PER_CAT/n),pn=Math.min(1-pt,NEW_PER_CAT/n);
+  const u=hash01(dk+'|t|'+id);
+  if(u<pt)return{tag:TAGS[Math.floor(hash01(dk+'|g|'+id)*TAGS.length)]};
+  if(u<pt+pn)return{isNew:true};
+  return{};
+}
+let _cntBusy=false;
+async function loadCatCounts(){
+  if(_cntBusy)return;_cntBusy=true;
+  try{
+    const {db,collection,query,where,getCountFromServer}=window._fb;
+    const todo=(cats||[]).filter(c=>c&&c.id&&catTot[c.id]===undefined);
+    if(todo.length){
+      await Promise.all(todo.map(async c=>{
+        try{const r=await getCountFromServer(query(collection(db,'products'),where('category','==',c.id)));catTot[c.id]=r.data().count||0;}
+        catch(e){catTot[c.id]=0;}
+      }));
+      if(typeof renderTienda==='function')renderTienda();
+      if(typeof renderNuevo==='function')renderNuevo();
+      if(typeof renderVendido==='function')renderVendido();
+    }
+  }catch(e){console.warn('loadCatCounts',e);}
+  _cntBusy=false;
+}
+// ¿Todos los productos tienen el campo "rnd"? Si sí, "Todo" se muestra mezclado
+async function probeMix(){
+  try{
+    const {db,collection,query,orderBy,getCountFromServer}=window._fb;
+    const a=(await getCountFromServer(query(collection(db,'products'),orderBy('rnd')))).data().count;
+    const b=(await getCountFromServer(query(collection(db,'products')))).data().count;
+    mixMissing=Math.max(0,b-a);mixOK=a>0&&mixMissing===0;
+  }catch(e){mixOK=false;mixMissing=0;console.warn('probeMix',e);}
+  updateMixBox();
+}
+function updateMixBox(){
+  const el=document.getElementById('mix-box');if(!el)return;
+  el.innerHTML=mixMissing>0
+    ?`<div style="font-size:.68rem;color:#ffb74d;line-height:1.6;margin-bottom:6px">⚠ ${mixMissing} producto${mixMissing>1?'s':''} aún no entra${mixMissing>1?'n':''} en la mezcla de «Todo». Mientras tanto «Todo» se ve por orden de llegada.</div><button type="button" class="adm-ghost-btn" style="padding:8px 14px;font-size:.62rem" onclick="migrateRnd()">🔀 Preparar mezcla de «Todo»</button><span id="mix-status" style="font-size:.62rem;color:rgba(255,255,255,.4);margin-left:10px"></span>`
+    :(mixOK?`<div style="font-size:.66rem;color:#2d9c5f">✔ «Todo» se muestra mezclado y cambia cada día.</div>`:'');
+}
+async function migrateRnd(){
+  if(!confirm('Voy a darle a cada producto un número al azar para poder mezclar «Todo». No cambia nada más de tus productos. Puede tardar un poco. ¿Continuar?'))return;
+  const {db,collection,getDocs,query,limit,startAfter,writeBatch}=window._fb;
+  const st=document.getElementById('mix-status');
+  let last=null,seen=0,upd=0;
+  try{
+    while(true){
+      const cons=[];if(last)cons.push(startAfter(last));cons.push(limit(60));
+      const snap=await getDocs(query(collection(db,'products'),...cons));
+      if(!snap.size)break;
+      const b=writeBatch(db);let n=0;
+      snap.forEach(d=>{if(typeof d.data().rnd!=='number'){b.update(d.ref,{rnd:Math.random()});n++;}});
+      if(n){await b.commit();upd+=n;}
+      seen+=snap.size;last=snap.docs[snap.docs.length-1];
+      if(st)st.textContent='Revisados '+seen+' · preparados '+upd+'...';
+      if(snap.size<60)break;
+    }
+    toast('✔ Mezcla lista ('+upd+' productos preparados)');
+    await refreshCatalog();
+  }catch(e){toast('⚠ Error preparando la mezcla: '+e.message);if(st)st.textContent='';}
+}
+// Página de "Todo" mezclada: orden por "rnd" empezando en un punto distinto cada día
+async function loadMixPage(){
+  const st=pgGet('__mix');
+  if(st.loading||st.done)return false;
+  st.loading=true;let got=0;
+  try{
+    const {db,collection,getDocs,query,where,orderBy,limit,startAfter}=window._fb;
+    const pv=dayPivot();const ids=[];let need=PAGE_SIZE;
+    while(need>0&&!st.done){
+      const ph=st.phase||0;
+      const cons=[ph===0?where('rnd','>=',pv):where('rnd','<',pv),orderBy('rnd')];
+      if(st.last)cons.push(startAfter(st.last));
+      cons.push(limit(need));
+      const snap=await getDocs(query(collection(db,'products'),...cons));
+      snap.forEach(d=>{const p=ingestProd(d);if(!ids.includes(p._fbId)&&!st.ids.includes(p._fbId))ids.push(p._fbId);});
+      if(snap.size)st.last=snap.docs[snap.docs.length-1];
+      const asked=need;need-=snap.size;
+      if(snap.size<asked){if(ph===0){st.phase=1;st.last=null;}else st.done=true;}
+    }
+    ids.forEach(id=>st.ids.push(id));
+    got=ids.length;
+    if(got)st.pages.push(ids);
+  }catch(e){console.warn('loadMixPage',e);toast('⚠ No se pudieron cargar los productos');st.done=true;}
+  st.loading=false;
+  return got>0;
+}
+
 async function loadPage(key){
+  if(key==='__mix')return loadMixPage();
   const st=pgGet(key);
   if(st.loading||st.done)return false;
   st.loading=true;let got=0;
@@ -166,7 +277,7 @@ async function loadCount(key){
   st.counting=true;
   try{
     const {db,collection,query,where,getCountFromServer}=window._fb;
-    const q=key==='__all'?query(collection(db,'products')):query(collection(db,'products'),where('category','==',key));
+    const q=(key==='__all'||key==='__mix')?query(collection(db,'products')):query(collection(db,'products'),where('category','==',key));
     const s=await getCountFromServer(q);
     st.total=s.data().count;
   }catch(e){console.warn('loadCount',e);}
@@ -195,13 +306,19 @@ async function loadPromos(){
     snap.forEach(d=>{const p=ingestProd(d);promoIds.push(p._fbId);});
   }catch(e){console.warn('loadPromos',e);}
 }
-async function catalogInit(){await Promise.all([loadPage('__all'),loadCount('__all'),loadPromos(),loadFeatured()]);}
+async function catalogInit(){
+  await Promise.all([loadPage('__all'),loadCount('__all'),loadPromos(),loadFeatured(),probeMix()]);
+  if(mixOK)await Promise.all([loadPage('__mix'),loadCount('__mix')]);
+  loadCatCounts();
+}
 async function refreshCatalog(){
   Object.keys(pgs).forEach(k=>delete pgs[k]);
   prods=[];promoIds=[];admQ='';admIds=[];
   const si=document.getElementById('adm-srch');if(si)si.value='';
+  catTot={};await probeMix();
   const k=tabKey();
   await Promise.all([loadPage('__all'),loadCount('__all'),k!=='__all'?loadPage(k):null,k!=='__all'?loadCount(k):null,loadPromos(),loadFeatured()]);
+  loadCatCounts();
   renderNuevo();renderVendido();renderTienda();renderAPL();
   if(typeof cvRefresh==="function")cvRefresh();
 }
@@ -297,7 +414,7 @@ function mkFeat(p,rank){
   const nm=esc(p.name),sold=!!p.soldOut,act=isPromoActive(p);
   const pid=JSON.stringify(p._fbId||p.id);
   const pos=p.imgPos||'center center',sc=p.imgScale||1;
-  const ih=p.img?`<img src="${p.img}" alt="${nm}" loading="lazy" style="object-position:${pos};transform:scale(${sc});transform-origin:${pos}${sold?';opacity:.45':''}">`:`<svg viewBox="0 0 200 300" fill="none">${pSVG(p)}</svg>`;
+  const ih=p.img?`<img src="${p.img}" alt="${nm}" loading="lazy" style="${sold?';opacity:.45':''}">`:`<svg viewBox="0 0 200 300" fill="none">${pSVG(p)}</svg>`;
   return`<div class="vd-card" onclick='openM(${pid})'>${ih}<span class="vd-rank">#${rank}</span>${sold?'<span class="pc-soldout">Agotado</span>':''}<div class="vd-info"><div class="vd-name">${nm}</div><div class="vd-price">${act?`<s>${fmt(p.promoOld)}</s>`:''}${fmt(p.price)}</div></div></div>`;
 }
 function renderVendido(){
@@ -527,12 +644,12 @@ function pSVG(p){
 }
 function mkCard(p, allowHot=true){
   const now=Date.now();
-  const iN=now-new Date(p.dateAdded).getTime()<NEW_TTL;
+  const dt=dayTag(p);const iN=!!dt.isNew;
   const act=isPromoActive(p);
   const sold=!!p.soldOut;
   const sc=p.imgScale||1;const po=p.imgPos||'center center';
   const nm=esc(p.name);
-  const ih=p.img?`<img src="${p.img}" alt="${nm}" loading="lazy" style="width:100%;height:100%;object-fit:cover;object-position:${po};transform:scale(${sc});transform-origin:${po}${sold?';opacity:.45':''}">`:`<svg viewBox="0 0 200 300" fill="none">${pSVG(p)}</svg>`;
+  const ih=p.img?`<img src="${p.img}" alt="${nm}" loading="lazy" style="width:100%;height:100%;object-fit:cover${sold?';opacity:.45':''}">`:`<svg viewBox="0 0 200 300" fill="none">${pSVG(p)}</svg>`;
   const pricesHTML=`<div class="pc-prices"><div class="pc-price-col">${act?`<span class="pc-old">${fmt(p.promoOld)}</span>`:''}<span class="pc-price-detal">${fmt(p.price)}</span></div></div>`;
   const pid = JSON.stringify(p._fbId||p.id);
   const ci=cart.find(x=>x.id===(p._fbId||p.id));
@@ -561,7 +678,7 @@ function mkCard(p, allowHot=true){
       ${sold?'<span class="pc-soldout">Agotado</span>':''}
       ${(!sold&&act)?`<span class="pc-promo">PROMO −${pctOff(p)}%</span>`:''}
       ${(!sold&&!act&&iN)?'<span class="pc-new">Nuevo</span>':''}
-      ${(!sold&&p.tag)?`<span class="pc-hot${(act||iN)?' pc-hot-new':''}">${esc(p.tag)}</span>`:''}
+      ${(!sold&&dt.tag)?`<span class="pc-hot${(act||iN)?' pc-hot-new':''}">${esc(dt.tag)}</span>`:''}
     </div>
     <div class="pc-body">
       <div class="pc-name">${nm}</div>
@@ -655,7 +772,7 @@ function openM(id){
   const ov=document.getElementById('pdp-ov');
   const pid=p._fbId||p.id;
   pdpCurId=pid;
-  const isNew=Date.now()-new Date(p.dateAdded).getTime()<OW;
+  const _dt=dayTag(p);const isNew=!!_dt.isNew;
   const act=isPromoActive(p);
   const sold=!!p.soldOut;
 
@@ -694,7 +811,7 @@ function openM(id){
 
   // Etiqueta (la escribe el administrador)
   const tagEl=document.getElementById('pdp-tag');
-  const tagTxt=sold?'Agotado':(p.tag||'');
+  const tagTxt=sold?'Agotado':(_dt.tag||'');
   tagEl.textContent=tagTxt;tagEl.style.display=tagTxt?'inline-block':'none';
 
   // Descripción
@@ -807,11 +924,64 @@ function swT(n,btn){
   document.querySelectorAll('.atc').forEach(t=>t.classList.remove('on'));
   document.getElementById('tab-'+n).classList.add('on');
   btn.classList.add('on');
-  if(n==='resenas') renderAdmRes();
 }
 
 // ── ADMIN: CROP 3:4 ──
 const cropState={};
+
+// Recortador en ventana: lo que ves en el marco es EXACTAMENTE lo que se guarda y lo que sale en la tienda (formato 4:5).
+// Si la imagen queda pequeña, el fondo se rellena de blanco.
+function openCropper(src,opts){
+  opts=opts||{};
+  const AW=4,AH=5,outW=opts.outW||480,outH=Math.round(outW*AH/AW);
+  const old=document.getElementById('cpm');if(old)old.remove();
+  const FW=Math.max(200,Math.min(320,Math.floor(window.innerWidth*0.8))),FH=Math.round(FW*AH/AW);
+  const ov=document.createElement('div');ov.id='cpm';ov.className='cpm';
+  ov.innerHTML=`<div class="cpm-box">
+    <div class="cpm-title">${opts.title||'Recortar imagen'}</div>
+    <div class="cpm-frame" id="cpm-frame" style="width:${FW}px;height:${FH}px"><canvas id="cpm-cv" width="${FW*2}" height="${FH*2}"></canvas></div>
+    <p class="cpm-help">Arrastra la imagen para moverla y usa el zoom. Si queda pequeña, el fondo se rellena de blanco.</p>
+    <div class="cpm-zoom"><span>−</span><input id="cpm-z" type="range" min="0.2" max="4" step="0.01" value="1"><span>+</span></div>
+    <div class="cpm-row"><button type="button" id="cpm-fill">Llenar marco</button><button type="button" id="cpm-fit">Ver completa</button></div>
+    <div class="cpm-row"><button type="button" id="cpm-cancel" class="ghost">Cancelar</button><button type="button" id="cpm-ok" class="ok">✔ Aplicar</button></div>
+  </div>`;
+  document.body.appendChild(ov);
+  const cv=ov.querySelector('#cpm-cv'),ctx=cv.getContext('2d'),zin=ov.querySelector('#cpm-z'),frame=ov.querySelector('#cpm-frame');
+  const img=new Image();let z=1,ox=0,oy=0,ready=false;
+  function draw(c,W,H){
+    c.fillStyle='#fff';c.fillRect(0,0,W,H);
+    if(!ready)return;
+    const iw=img.naturalWidth,ih=img.naturalHeight,sc=Math.max(W/iw,H/ih)*z,dw=iw*sc,dh=ih*sc;
+    c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';
+    c.drawImage(img,W/2-dw/2+ox*W,H/2-dh/2+oy*H,dw,dh);
+  }
+  const paint=()=>draw(ctx,cv.width,cv.height);
+  const setZ=v=>{z=Math.max(0.2,Math.min(4,v));zin.value=z;paint();};
+  img.onload=()=>{ready=true;paint();};
+  img.onerror=()=>{toast('⚠ No se pudo abrir la imagen');close();};
+  img.src=src;
+  zin.oninput=()=>{z=parseFloat(zin.value);paint();};
+  ov.querySelector('#cpm-fill').onclick=()=>{ox=0;oy=0;setZ(1);};
+  ov.querySelector('#cpm-fit').onclick=()=>{ox=0;oy=0;const iw=img.naturalWidth,ih=img.naturalHeight;setZ(Math.min(FW/iw,FH/ih)/Math.max(FW/iw,FH/ih));};
+  let drag=null;
+  frame.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY,ox,oy};frame.setPointerCapture(e.pointerId);e.preventDefault();});
+  frame.addEventListener('pointermove',e=>{if(!drag)return;ox=Math.max(-1.5,Math.min(1.5,drag.ox+(e.clientX-drag.x)/FW));oy=Math.max(-1.5,Math.min(1.5,drag.oy+(e.clientY-drag.y)/FH));paint();});
+  const end=()=>{drag=null;};
+  frame.addEventListener('pointerup',end);frame.addEventListener('pointercancel',end);
+  frame.addEventListener('wheel',e=>{e.preventDefault();setZ(z*(e.deltaY<0?1.06:0.94));},{passive:false});
+  function close(){document.removeEventListener('keydown',onKey);ov.remove();}
+  function onKey(e){if(e.key==='Escape')close();}
+  document.addEventListener('keydown',onKey);
+  ov.querySelector('#cpm-cancel').onclick=close;
+  ov.querySelector('#cpm-ok').onclick=()=>{
+    if(!ready)return;
+    const out=document.createElement('canvas');out.width=outW;out.height=outH;
+    draw(out.getContext('2d'),outW,outH);
+    const url=out.toDataURL('image/jpeg',0.9);
+    close();
+    if(opts.onDone)opts.onDone(url);
+  };
+}
 
 function buildCropBox(mountId,key,aspect,onAccept){
   const container=document.getElementById(mountId);
@@ -819,83 +989,58 @@ function buildCropBox(mountId,key,aspect,onAccept){
   container.dataset.built='1';
   container.innerHTML=`
     <div class="cb">
-      <div class="cb-prev" id="crop-prev-${key}">
+      <div class="cb-prev" id="crop-prev-${key}" onclick="cropPrevClick('${key}')">
         <span class="cb-ph">🖼</span>
         <img id="crop-img-${key}" style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover" alt="">
       </div>
       <div class="cb-side">
-        <input type="file" id="crop-file-${key}" accept="image/*" style="display:none" onchange="cropLoad('${key}',event,'${aspect}')">
+        <input type="file" id="crop-file-${key}" accept="image/*" style="display:none" onchange="cropLoad('${key}',event)">
         <button type="button" class="cb-btn" id="crop-pick-${key}" onclick="document.getElementById('crop-file-${key}').click()">📁 Elegir foto</button>
-        <p class="cb-help" id="crop-help-${key}">Se recorta en formato vertical. Elige la foto y arrástrala para acomodarla.</p>
-        <div id="crop-range-${key}" style="display:none">
-          <label class="cb-lbl">🔍 Zoom</label>
-          <input type="range" min="1" max="3" step="0.01" value="1" style="width:100%;accent-color:var(--accent)" oninput="cropZoom('${key}',this.value)">
-        </div>
-        <button type="button" id="crop-accept-${key}" style="display:none"></button>
+        <button type="button" class="cb-btn" id="crop-edit-${key}" style="display:none" onclick="cropReopen('${key}')">✂ Recortar / ajustar</button>
+        <p class="cb-help" id="crop-help-${key}">Elige la foto y recórtala. Se verá exactamente así en la tienda (formato 4:5).</p>
       </div>
     </div>`;
-  cropState[key]={src:null,zoom:1,dx:0,dy:0,dragging:false,startX:0,startY:0,onAccept};
-  // drag to reposition — mouse
-  const prev=container.querySelector(`#crop-prev-${key}`);
-  prev.style.cursor='grab';
-  prev.addEventListener('mousedown',e=>{if(!cropState[key].src)return;cropState[key].dragging=true;cropState[key].startX=e.clientX-cropState[key].dx;cropState[key].startY=e.clientY-cropState[key].dy;prev.style.cursor='grabbing';e.preventDefault();});
-  document.addEventListener('mousemove',e=>{const s=cropState[key];if(!s||!s.dragging)return;s.dx=e.clientX-s.startX;s.dy=e.clientY-s.startY;cropApplyTransform(key);});
-  document.addEventListener('mouseup',()=>{if(cropState[key])cropState[key].dragging=false;prev.style.cursor='grab';});
-  // drag to reposition — touch
-  prev.addEventListener('touchstart',e=>{if(!cropState[key].src)return;const t=e.touches[0];cropState[key].dragging=true;cropState[key].startX=t.clientX-cropState[key].dx;cropState[key].startY=t.clientY-cropState[key].dy;e.preventDefault();},{passive:false});
-  prev.addEventListener('touchmove',e=>{const s=cropState[key];if(!s||!s.dragging)return;const t=e.touches[0];s.dx=t.clientX-s.startX;s.dy=t.clientY-s.startY;cropApplyTransform(key);e.preventDefault();},{passive:false});
-  prev.addEventListener('touchend',()=>{if(cropState[key])cropState[key].dragging=false;});
+  cropState[key]={src:null,orig:null,baked:false,onAccept};
 }
-
-function cropLoad(key,event,aspect){
+function cropPrevClick(key){const s=cropState[key];if(s&&s.src)cropReopen(key);else{const f=document.getElementById('crop-file-'+key);if(f)f.click();}}
+function cropLoad(key,event){
   const file=event.target.files[0];if(!file)return;
   const r=new FileReader();
   r.onload=e=>{
-    // Pre-compress so canvas operations are fast and localStorage stays light
-    compressImg(e.target.result, 1200, 1600, 0.85, src=>{
-      cropState[key].src=src;cropState[key].zoom=1;cropState[key].dx=0;cropState[key].dy=0;
-      const img=document.getElementById(`crop-img-${key}`);
-      img.src=src;img.style.display='block';img.style.transform='scale(1) translate(0,0)';
-      const ph=document.querySelector(`#crop-prev-${key} .cb-ph`);if(ph)ph.style.display='none';
-      const pk=document.getElementById(`crop-pick-${key}`);if(pk)pk.textContent='🔄 Cambiar foto';
-      const hp=document.getElementById(`crop-help-${key}`);if(hp)hp.textContent='✔ Foto lista. Arrastra para mover y usa el zoom si quieres acercarla.';
-      document.getElementById(`crop-range-${key}`).style.display='block';
-      const rangeEl=document.querySelector(`#crop-range-${key} input`);
-      if(rangeEl)rangeEl.value=1;
+    compressImg(e.target.result,1600,1600,0.9,src=>{
+      cropState[key].orig=src;
+      openCropper(src,{onDone:url=>cropSet(key,url)});
     });
   };
   r.readAsDataURL(file);
+  event.target.value='';
 }
-function cropZoom(key,val){
-  cropState[key].zoom=parseFloat(val);
-  cropApplyTransform(key);
+function cropReopen(key){
+  const s=cropState[key];if(!s)return;
+  const src=s.orig||s.src;if(!src)return;
+  openCropper(src,{onDone:url=>cropSet(key,url)});
 }
-function cropApplyTransform(key){
-  const s=cropState[key];
-  const img=document.getElementById(`crop-img-${key}`);
-  if(img)img.style.transform=`scale(${s.zoom}) translate(${s.dx/s.zoom}px,${s.dy/s.zoom}px)`;
+function cropSet(key,url){
+  const s=cropState[key];if(!s)return;
+  s.src=url;s.baked=true;
+  const img=document.getElementById(`crop-img-${key}`);if(img){img.src=url;img.style.display='block';}
+  cropShowTools(key);
+  if(key==='prod-edit')markDirty('btn-save-em');
+  toast('✔ Recorte listo');
 }
-function cropAccept(key){
-  const s=cropState[key];
-  if(!s||!s.src){toast('⚠ Primero elige una imagen');return;}
-  // Render to canvas with 3:4 ratio (or free)
-  const img=new Image();
-  img.onload=()=>{
-    const canvas=document.createElement('canvas');
-    const W=600,H=800; // 3:4
-    canvas.width=W;canvas.height=H;
-    const ctx=canvas.getContext('2d');
-    const iw=img.naturalWidth,ih=img.naturalHeight;
-    // scale to fill
-    const scale=s.zoom*Math.max(W/iw,H/ih);
-    const sw=iw*scale,sh=ih*scale;
-    const ox=(W-sw)/2+s.dx;const oy=(H-sh)/2+s.dy;
-    ctx.drawImage(img,ox,oy,sw,sh);
-    const dataUrl=canvas.toDataURL('image/jpeg',0.85);
-    if(s.onAccept)s.onAccept(dataUrl);
-    toast('✔ Imagen recortada y lista');
-  };
-  img.src=s.src;
+function cropShowTools(key){
+  const ph=document.querySelector(`#crop-prev-${key} .cb-ph`);if(ph)ph.style.display='none';
+  const pk=document.getElementById(`crop-pick-${key}`);if(pk)pk.textContent='🔄 Cambiar foto';
+  const ed=document.getElementById(`crop-edit-${key}`);if(ed)ed.style.display='';
+  const hp=document.getElementById(`crop-help-${key}`);if(hp)hp.textContent='✔ Así se verá en la tienda. Toca «Recortar / ajustar» para cambiarlo.';
+}
+function cropReset(key){
+  cropState[key]={src:null,orig:null,baked:false,onAccept:null};
+  const img=document.getElementById(`crop-img-${key}`);if(img){img.src='';img.style.display='none';}
+  const ph=document.querySelector(`#crop-prev-${key} .cb-ph`);if(ph)ph.style.display='';
+  const pk=document.getElementById(`crop-pick-${key}`);if(pk)pk.textContent='📁 Elegir foto';
+  const ed=document.getElementById(`crop-edit-${key}`);if(ed)ed.style.display='none';
+  const hp=document.getElementById(`crop-help-${key}`);if(hp)hp.textContent='Elige la foto y recórtala. Se verá exactamente así en la tienda (formato 4:5).';
 }
 
 // ── SLIDER CROP: drag libre con mouse Y touch, preview 16:9 escritorio ──
@@ -1156,14 +1301,14 @@ function validateProd(d){
   return true;
 }
 async function cropToDataUrl(s){
-  return new Promise(resolve=>{
+  if(s.baked)return window._compressProd(s.src);   // ya recortada en el recortador (4:5)
+  return new Promise(resolve=>{                      // importación masiva: centra y llena el marco 4:5
     const img=new Image();
     img.onload=async()=>{
-      const canvas=document.createElement('canvas');canvas.width=600;canvas.height=800;
-      const ctx=canvas.getContext('2d');
-      const iw=img.naturalWidth,ih=img.naturalHeight;
-      const scale=s.zoom*Math.max(600/iw,800/ih);
-      ctx.drawImage(img,(600-iw*scale)/2+s.dx,(800-ih*scale)/2+s.dy,iw*scale,ih*scale);
+      const W=600,H=750,canvas=document.createElement('canvas');canvas.width=W;canvas.height=H;
+      const ctx=canvas.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H);
+      const iw=img.naturalWidth,ih=img.naturalHeight,sc=Math.max(W/iw,H/ih);
+      ctx.drawImage(img,(W-iw*sc)/2,(H-ih*sc)/2,iw*sc,ih*sc);
       resolve(await window._compressProd(canvas.toDataURL('image/jpeg',0.9)));
     };
     img.onerror=()=>resolve(null);
@@ -1196,16 +1341,13 @@ async function addP(){
   try{
     const s=cropState['prod-new'];
     const imgData=(s&&s.src)?await cropToDataUrl(s):null;
-    const pData={...d,tag:randomTag(),promo:false,dateAdded:new Date().toISOString(),img:imgData,kw:buildKw(d.name+' '+d.keywords)};
+    const pData={...d,tag:'',rnd:Math.random(),promo:false,dateAdded:new Date().toISOString(),img:imgData,kw:buildKw(d.name+' '+d.keywords)};
     const {db,doc,setDoc}=window._fb;
     await setDoc(doc(db,'products',newDocId()),pData);
     addVocab(d.name+' '+d.keywords);
     ['f-nm','f-px','f-desc','f-kwd'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
     document.getElementById('f-av').value='1';
-    if(cropState['prod-new']){cropState['prod-new']={src:null,zoom:1,dx:0,dy:0,dragging:false,startX:0,startY:0,onAccept:null};}
-    const ci=document.getElementById('crop-img-prod-new');if(ci){ci.src='';ci.style.display='none';}
-    const ca=document.getElementById('crop-accept-prod-new');if(ca)ca.style.display='none';
-    const cr=document.getElementById('crop-range-prod-new');if(cr)cr.style.display='none';
+    cropReset('prod-new');
     await refreshCatalog();
     toast('✔ Producto agregado. Visible para todos.');
   }catch(e){toast('⚠ Error guardando: '+e.message);}
@@ -1312,7 +1454,7 @@ async function cvImport(inp){
       const src=await cvReadFile(files[i]);
       const img=src?await cropToDataUrl({src,zoom:1,dx:0,dy:0}):null;
       if(!img)throw new Error('imagen no válida');
-      const pData={name:'Producto nuevo',price:0,desc:'',soldOut:false,category:cat,keywords:'',tag:randomTag(),promo:false,dateAdded:new Date().toISOString(),img,kw:[]};
+      const pData={name:'Producto nuevo',price:0,desc:'',soldOut:false,category:cat,keywords:'',tag:'',rnd:Math.random(),promo:false,dateAdded:new Date().toISOString(),img,kw:[]};
       await setDoc(doc(db,'products',newDocId()),pData);
       ok++;
       await new Promise(r=>setTimeout(r,3));
@@ -1392,13 +1534,12 @@ function openEM(id){
   set('e-kwd',p.keywords||'');
   clearDirty('btn-save-em');
   const key='prod-edit';
+  cropReset(key);
   if(p.img){
-    if(!cropState[key])cropState[key]={src:null,zoom:1,dx:0,dy:0,dragging:false,startX:0,startY:0};
     cropState[key].src=p.img;
     const ci=document.getElementById(`crop-img-${key}`);
     if(ci){ci.src=p.img;ci.style.display='block';}
-    const ph=document.querySelector(`#crop-prev-${key} .cb-ph`);if(ph)ph.style.display='none';
-    const rg=document.getElementById(`crop-range-${key}`);if(rg)rg.style.display='block';
+    cropShowTools(key);
   }
   document.getElementById('em').style.display='flex';
 }
@@ -1470,81 +1611,22 @@ function renderAPL(){
 // ── ADMIN: CATEGORÍAS ──
 function renderCE(){
   const el=document.getElementById('cat-ed');
-  el.innerHTML=cats.map((c,i)=>{
-    const zoom=c.imgZoom||1;
-    const dx=c.imgDx||0;
-    const dy=c.imgDy||0;
-    return`
+  el.innerHTML=cats.map((c,i)=>`
     <div class="ce-item${c.img?' has-img':''}">
       <button class="ce-del" onclick="delCat(${i})">✕</button>
-      <div id="ce-drag-${i}" class="ce-img" style="overflow:hidden;${c.img?'cursor:grab;touch-action:none':''}">
-        ${c.img
-          ?`<img id="ce-prev-${i}" src="${c.img}" style="width:100%;height:100%;object-fit:cover;transform-origin:center center;transform:scale(${zoom}) translate(${dx/zoom}px,${dy/zoom}px);pointer-events:none">`
-          :`<svg viewBox="0 0 100 140">${mkCSVG(c.id)}</svg>`
-        }
-        <input type="file" id="ce-img-inp-${i}" accept="image/*" style="display:${c.img?'none':'block'};position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%" onchange="catImgNew(${i},event)">
+      <div class="ce-img" onclick="catPick(${i})" title="${c.img?'Cambiar imagen':'Agregar imagen'}">
+        ${c.img?`<img src="${c.img}" alt="">`:`<svg viewBox="0 0 100 140">${mkCSVG(c.id)}</svg>`}
       </div>
-      ${c.img?`
-      <p class="ce-img-label" style="font-size:.42rem;color:rgba(255,255,255,.35)">☝ Arrastra · Toca 2× para cambiar</p>
-      <div class="ce-adj">
-        <span class="ce-adj-lbl">Zoom</span>
-        <input type="range" min="0.5" max="3" step="0.05" value="${zoom}"
-          oninput="cats[${i}].imgZoom=+this.value;ceDragApply(${i})">
-      </div>
-      <button style="font-size:.48rem;letter-spacing:.1em;color:rgba(255,255,255,.3);background:none;border:none;cursor:pointer;text-transform:uppercase;margin-top:2px" onclick="document.getElementById('ce-img-inp-${i}-rep').click()">📁 Cambiar imagen</button>
-      <input type="file" id="ce-img-inp-${i}-rep" accept="image/*" style="display:none" onchange="catImgNew(${i},event)">
-      `:`<p class="ce-img-label">Toca para agregar</p>`}
-      <input class="ce-n" value="${c.label}" onchange="cats[${i}].label=this.value">
+      <input type="file" id="ce-img-inp-${i}" accept="image/*" style="display:none" onchange="catImgNew(${i},event)">
+      <button type="button" class="ce-btn" onclick="document.getElementById('ce-img-inp-${i}').click()">📁 ${c.img?'Cambiar imagen':'Agregar imagen'}</button>
+      ${c.img?`<button type="button" class="ce-btn" onclick="catRecrop(${i})">✂ Recortar / ajustar</button>`:''}
+      <input class="ce-n" value="${esc(c.label)}" onchange="cats[${i}].label=this.value">
       <button class="adm-ghost-btn" style="margin-top:8px;width:100%;padding:8px 6px;font-size:.55rem" onclick="cvOpen(${i})">📂 Ver productos</button>
-    </div>`;
-  }).join('');
-  // Bind drag after render
-  cats.forEach((_,i)=>{ if(cats[i].img) setTimeout(()=>ceBindDrag(i),0); });
+    </div>`).join('');
 }
-function updateCEPreview(i,reRenderPos){
-  const img=document.getElementById(`ce-prev-${i}`);
-  if(!img)return;
-  const zoom=cats[i].imgZoom||1;
-  const pos=cats[i].imgPos||'center center';
-  img.style.transform=`scale(${zoom})`;
-  img.style.objectPosition=pos;
-  if(reRenderPos)renderCE();
-}
-
-// Category drag state
-const ceDrag={};
-
-function ceDragStart(i,cx,cy){
-  ceDrag[i]={dragging:true,startX:cx-(cats[i].imgDx||0),startY:cy-(cats[i].imgDy||0)};
-}
-function ceDragMove(i,cx,cy){
-  if(!ceDrag[i]||!ceDrag[i].dragging)return;
-  cats[i].imgDx=(cx-ceDrag[i].startX);
-  cats[i].imgDy=(cy-ceDrag[i].startY);
-  ceDragApply(i);
-}
-function ceDragEnd(i){if(ceDrag[i])ceDrag[i].dragging=false;}
-function ceDragApply(i){
-  const img=document.getElementById(`ce-prev-${i}`);
-  if(!img)return;
-  const zoom=cats[i].imgZoom||1;
-  const dx=cats[i].imgDx||0;
-  const dy=cats[i].imgDy||0;
-  img.style.transform=`scale(${zoom}) translate(${dx/zoom}px,${dy/zoom}px)`;
-  img.style.objectPosition='center center';
-}
-function ceBindDrag(i){
-  const el=document.getElementById(`ce-drag-${i}`);
-  if(!el||el.dataset.bound)return;
-  el.dataset.bound='1';
-  el.style.cursor='grab';
-  el.addEventListener('mousedown',e=>{ceDragStart(i,e.clientX,e.clientY);el.style.cursor='grabbing';e.preventDefault();});
-  document.addEventListener('mousemove',e=>{ceDragMove(i,e.clientX,e.clientY);});
-  document.addEventListener('mouseup',()=>{ceDragEnd(i);el.style.cursor='grab';});
-  el.addEventListener('touchstart',e=>{const t=e.touches[0];ceDragStart(i,t.clientX,t.clientY);e.preventDefault();},{passive:false});
-  el.addEventListener('touchmove',e=>{const t=e.touches[0];ceDragMove(i,t.clientX,t.clientY);e.preventDefault();},{passive:false});
-  el.addEventListener('touchend',()=>ceDragEnd(i));
-}
+function catPick(i){const f=document.getElementById(`ce-img-inp-${i}`);if(f)f.click();}
+function catSet(i,url){cats[i].img=url;cats[i].imgZoom=1;cats[i].imgDx=0;cats[i].imgDy=0;renderCE();markDirty('btn-save-cats');}
+function catRecrop(i){if(cats[i]&&cats[i].img)openCropper(cats[i].img,{title:'Recortar imagen de categoría',onDone:url=>catSet(i,url)});}
 // ── Compress image to target size before storing ──
 function compressImg(src, maxW, maxH, quality, cb){
   const img = new Image();
@@ -1566,16 +1648,12 @@ function catImgNew(i,event){
   const file=event.target.files[0];if(!file)return;
   const r=new FileReader();
   r.onload=e=>{
-    // Compress: max 400x533px (exact 3:4 ratio matching page display), quality 0.75
-    compressImg(e.target.result, 400, 534, 0.75, compressed=>{
-      cats[i].img=compressed;
-      cats[i].imgZoom=cats[i].imgZoom||1;
-      cats[i].imgDx=0;
-      cats[i].imgDy=0;
-      renderCE();markDirty('btn-save-cats');
+    compressImg(e.target.result,1600,1600,0.9,src=>{
+      openCropper(src,{title:'Recortar imagen de categoría',onDone:url=>catSet(i,url)});
     });
   };
   r.readAsDataURL(file);
+  event.target.value='';
 }
 function addCat(){cats.push({id:'cat-'+Date.now(),label:'Nueva categoría',img:null,imgZoom:1,imgPos:'center center'});renderCE();markDirty('btn-save-cats');}
 function delCat(i){if(!confirm('¿Eliminar esta categoría?'))return;cats.splice(i,1);renderCE();markDirty('btn-save-cats');}
@@ -1638,117 +1716,14 @@ function popSels(){
   ['f-ct','e-ct'].forEach(id=>{const s=document.getElementById(id);if(s)s.innerHTML=o;});
 }
 
-// ── SUBSCRIBE ──
-function subscribeEmail(){const v=document.getElementById('foot-email').value.trim();if(!v||!v.includes('@')){toast('⚠ Ingresa un correo válido');return;}toast('✔ ¡Gracias! Te mantendremos informada.');document.getElementById('foot-email').value='';}
-
-
 // ── UTILIDADES ──
 function fmt(n){return'$ '+n.toLocaleString('es-CO')}
 function toast(msg){const t=document.getElementById('toast');if(!t)return;t.textContent=msg;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),2500);}
 
 
-// ── RESEÑAS ──
-const DR=[];
-let reviews = [];
-// svR now handled by Firebase — individual operations write directly
-
-let resStarSel = 5;
-function initResStars(){
-  const stars = document.querySelectorAll('#res-star-pick span');
-  stars.forEach((s,i)=>{
-    s.classList.toggle('on', i<resStarSel);
-    s.addEventListener('mouseover',()=>stars.forEach((x,j)=>x.classList.toggle('on',j<=i)));
-    s.addEventListener('mouseout',()=>stars.forEach((x,j)=>x.classList.toggle('on',j<resStarSel)));
-    s.addEventListener('click',()=>{resStarSel=+s.dataset.v;stars.forEach((x,j)=>x.classList.toggle('on',j<resStarSel));});
-  });
-}
-
-function starsHTML(n){return'★'.repeat(n)+'☆'.repeat(5-n);}
-
-function fmtDate(d){
-  try{
-    const dt=new Date(d);
-    return dt.toLocaleDateString('es-CO',{year:'numeric',month:'short',day:'numeric'});
-  }catch(e){return d;}
-}
-
-function renderResenas(){
-  const el=document.getElementById('res-grid');
-  if(!el)return;
-  const approved=reviews.filter(r=>r.approved);
-  if(!approved.length){
-    el.innerHTML='<p style="text-align:center;color:var(--textd);font-style:italic;font-size:.8rem;grid-column:1/-1;padding:24px 0">Sé la primera en comentar.</p>';
-    return;
-  }
-  el.innerHTML=approved.map(r=>`
-    <div class="res-card">
-      <div class="res-card-stars">${starsHTML(r.stars)}</div>
-      <p class="res-card-msg">${r.msg}</p>
-      <div class="res-card-footer">
-        <div>
-          <div class="res-card-name">${r.name}</div>
-          <div class="res-verified">✔ Compra verificada</div>
-        </div>
-        <span class="res-card-date">${fmtDate(r.date)}</span>
-      </div>
-    </div>`).join('');
-}
-
-function renderAdmRes(){
-  const el=document.getElementById('adm-res-list');
-  if(!el)return;
-  if(!reviews.length){el.innerHTML='<p style="font-size:.66rem;color:rgba(255,255,255,.2);text-align:center;padding:28px;font-style:italic">No hay reseñas aún.</p>';return;}
-  el.innerHTML=reviews.map(r=>`
-    <div class="res-adm-row">
-      <div class="res-adm-body">
-        <div class="res-adm-name">${r.name} ${r.approved?'<span style="color:#2d9c5f;font-size:.55rem">✔ Aprobada</span>':'<span style="color:var(--accent);font-size:.55rem">⏳ Pendiente</span>'}</div>
-        <div class="res-adm-stars">${starsHTML(r.stars)}</div>
-        <div class="res-adm-msg">"${r.msg}"</div>
-        <div class="res-adm-date">${fmtDate(r.date)}</div>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:7px;flex-shrink:0">
-        ${!r.approved?`<button class="res-adm-del" style="background:rgba(45,156,95,.12);border-color:rgba(45,156,95,.3);color:#2d9c5f" onclick="approveRes('${r.id}')">✔ Aprobar</button>`:''}
-        <button class="res-adm-del" onclick="deleteRes('${r.id}')">✕ Eliminar</button>
-      </div>
-    </div>`).join('');
-}
-
-async function approveRes(id){
-  try{
-    const {db, doc, updateDoc} = window._fb;
-    await updateDoc(doc(db,'reviews', String(id)), {approved:true});
-    toast('✔ Reseña aprobada');
-  }catch(e){ toast('⚠ Error: '+e.message); }
-}
-async function deleteRes(id){
-  if(!confirm('¿Eliminar esta reseña?'))return;
-  try{
-    const {db, doc, deleteDoc} = window._fb;
-    await deleteDoc(doc(db,'reviews', String(id)));
-    toast('✔ Reseña eliminada');
-  }catch(e){ toast('⚠ Error: '+e.message); }
-}
-async function submitRes(){
-  const name=document.getElementById('res-inp-name').value.trim();
-  const msg=document.getElementById('res-inp-msg').value.trim();
-  if(!name){toast('⚠ Ingresa tu nombre');return;}
-  if(msg.length<10){toast('⚠ El comentario es muy corto');return;}
-  const r={name,date:new Date().toISOString().slice(0,10),stars:resStarSel,msg,approved:false};
-  try{
-    const {db, collection, addDoc} = window._fb;
-    await addDoc(collection(db,'reviews'), r);
-    document.getElementById('res-inp-name').value='';
-    document.getElementById('res-inp-msg').value='';
-    resStarSel=5;
-    document.querySelectorAll('#res-star-pick span').forEach((s,j)=>s.classList.toggle('on',j<5));
-    toast('✔ ¡Gracias! Tu reseña será publicada pronto.');
-  }catch(e){ toast('⚠ Error enviando reseña: '+e.message); }
-}
-
 // ── INIT ── (Firebase module handles data loading & real-time listeners)
 // These run immediately for UI that doesn't need Firebase data
 updC();
-initResStars();
 if(document.getElementById('nuevo-scroll'))
   document.getElementById('nuevo-scroll').addEventListener('scroll',updNA);
 
